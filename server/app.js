@@ -1,10 +1,9 @@
-import express from 'express'; // Changed from const express = require("express");
+import express from 'express';
 
 const app = express();
 app.use(express.json());
 
 //connect to db
-
 
 // define a port number and giving us console log messages
 const port = 3000;
