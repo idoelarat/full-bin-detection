@@ -1,6 +1,6 @@
 // config/db.js
-import mysql from 'mysql2';
-
+//import mysql from 'mysql2';
+/*
 const connection = mysql.createConnection({
   host: 'localhost',
   user: 'your_username',
@@ -17,3 +17,4 @@ connection.connect(err => {
 });
 
 export default connection;
+*/
