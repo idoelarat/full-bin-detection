@@ -1,11 +1,11 @@
-// config/db.js
-//import mysql from 'mysql2';
-/*
+//config/db.js
+import mysql from 'mysql2';
+
 const connection = mysql.createConnection({
   host: 'localhost',
-  user: 'your_username',
-  password: 'your_password',
-  database: 'your_database'
+  user: 'root',
+  password: '123456',
+  database: 'fbd_db'
 });
 
 connection.connect(err => {
@@ -17,4 +17,3 @@ connection.connect(err => {
 });
 
 export default connection;
-*/

@@ -1,11 +1,12 @@
-import express from 'express';
-//import db from './config/db.js';
+import express from "express";
+import db from "./config/db.js";
+import areaRoutes from "./routes/areaRoutes.js";
 
 const app = express();
 app.use(express.json());
 
 //connect to db
-//console.log('App started, DB should be connected.');
+console.log("App started, DB should be connected.");
 
 // define a port number and giving us console log messages
 const port = 3000;
@@ -14,3 +15,16 @@ app.listen(port, () => {
 });
 
 //routes
+app.use("/api/areas", areaRoutes);
+
+// Graceful shutdown of the database connection
+process.on("SIGINT", () => {
+  db.end((err) => {
+    if (err) {
+      console.error("Error closing MySQL connection:", err);
+      return;
+    }
+    console.log("❌ MySQL connection closed.");
+    process.exit(0);
+  });
+});
