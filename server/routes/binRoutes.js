@@ -15,4 +15,7 @@ router.delete('/:id', binController.deleteBin);
 // Update a bin by ID
 router.put('/:id', binController.updateBin);    
 
+// Create a new bin
+router.post('/', binController.create);
+
 export default router;
