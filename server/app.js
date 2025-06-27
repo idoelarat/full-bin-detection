@@ -1,6 +1,7 @@
 import express from "express";
 import db from "./config/db.js";
 import areaRoutes from "./routes/areaRoutes.js";
+import binRoutes from './routes/binRoutes.js';
 
 const app = express();
 app.use(express.json());
@@ -16,6 +17,9 @@ app.listen(port, () => {
 
 //routes
 app.use("/api/areas", areaRoutes);
+app.use("/api/bins", binRoutes);
+
+
 
 // Graceful shutdown of the database connection
 process.on("SIGINT", () => {

@@ -12,4 +12,7 @@ router.get('/:id', binController.getBinById);
 // Delete a bin by ID
 router.delete('/:id', binController.deleteBin); 
 
+// Update a bin by ID
+router.put('/:id', binController.updateBin);    
+
 export default router;
