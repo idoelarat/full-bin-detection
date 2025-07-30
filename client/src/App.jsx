@@ -1,20 +1,13 @@
-import { useState } from "react";
-import "./App.css";
+import './App.css'
+import MapHolder from './components/mapHolder'
 
 function App() {
-  const [count, setCount] = useState(0);
 
   return (
     <>
-      <div></div>
-      <h1>Full Bin Detection System</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-      </div>
+    <MapHolder/>
     </>
-  );
+  )
 }
 
-export default App;
+export default App
