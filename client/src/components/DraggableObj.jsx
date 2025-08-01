@@ -1,9 +1,13 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
-// Import your trash-bin.png image
-import trashBinImage from '../assets/trash-bin.png'; // Make sure the path is correct
+import trashBinImage from '../assets/trash-bin.png';
 
-function DraggableObj({ id, containerRef }) {
-  const [position, setPosition] = useState({ x: 0, y: 0 });
+// The component now accepts the onDragEnd callback as a prop
+function DraggableObj({ id, containerRef, initialX, initialY, onDragEnd }) {
+  // Use a default value of 0 if initialX or initialY are not numbers
+  const safeX = typeof initialX === 'number' ? initialX : 0;
+  const safeY = typeof initialY === 'number' ? initialY : 0;
+
+  const [position, setPosition] = useState({ x: safeX, y: safeY });
   const [isDragging, setIsDragging] = useState(false);
 
   const draggableRef = useRef(null);
@@ -44,8 +48,12 @@ function DraggableObj({ id, containerRef }) {
   }, [containerRef, isDragging]);
 
   const handleMouseUp = useCallback(() => {
-    setIsDragging(false);
-  },[]);
+    if (isDragging) {
+      setIsDragging(false);
+      // Call the onDragEnd prop to send the new position to the parent
+      onDragEnd(id, position.x, position.y);
+    }
+  }, [isDragging, id, position, onDragEnd]);
 
   useEffect(() => {
     document.addEventListener("mousemove", handleMouseMove);
@@ -56,6 +64,10 @@ function DraggableObj({ id, containerRef }) {
       document.removeEventListener("mouseup", handleMouseUp);
     };
   }, [handleMouseMove, handleMouseUp]);
+  
+  useEffect(() => {
+    setPosition({ x: initialX, y: initialY });
+  }, [initialX, initialY]);
 
   return (
     <div
@@ -63,10 +75,7 @@ function DraggableObj({ id, containerRef }) {
       style={objStyle}
       onMouseDown={handleMouseDown}
     >
-      {/* Render the trash-bin.png image */}
       <img src={trashBinImage} alt="Trash Bin" style={{ width: '50px', height: '50px', pointerEvents: 'none' }} />
-      {/* The children prop is no longer directly used for content if you're always showing the image.
-          You could use it for an overlay or additional content if needed. */}
     </div>
   );
 }
