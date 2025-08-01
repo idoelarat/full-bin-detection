@@ -1,9 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import trashBinImage from '../assets/trash-bin.png';
 
-// The component now accepts the onDragEnd callback as a prop
-function DraggableObj({ id, containerRef, initialX, initialY, onDragEnd }) {
-  // Use a default value of 0 if initialX or initialY are not numbers
+function DraggableObj({ id, containerRef, initialX, initialY, onDragEnd, onBinClick, isClicked, binDesc }) {
   const safeX = typeof initialX === 'number' ? initialX : 0;
   const safeY = typeof initialY === 'number' ? initialY : 0;
 
@@ -12,22 +10,41 @@ function DraggableObj({ id, containerRef, initialX, initialY, onDragEnd }) {
 
   const draggableRef = useRef(null);
 
+  // Define the filter to apply based on the binDesc
+  const binFilter = binDesc === "0"
+    ? "invert(50%) sepia(100%) hue-rotate(90deg) saturate(200%)" // Green filter
+    : (binDesc === "1"
+      ? "invert(20%) sepia(100%) saturate(1000%) hue-rotate(330deg)" // Red filter
+      : "none"); // No filter for other values
+
   const objStyle = {
     position: "absolute",
     top: position.y,
     left: position.x,
-    cursor: "grab",
-    zIndex: 10,
+    cursor: isDragging ? "grabbing" : "grab",
+    zIndex: isDragging ? 20 : 10,
     userSelect: "none",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
+    border: isClicked ? "2px dashed blue" : "none",
+    width: "50px",
+    height: "50px",
+    boxSizing: "border-box",
+  };
+
+  const imgStyle = {
+    width: '100%',
+    height: '100%',
+    objectFit: 'contain',
+    filter: binFilter, // Apply the color filter here
   };
 
   const handleMouseDown = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
     setIsDragging(true);
     draggableRef.current.startX = e.clientX - position.x;
     draggableRef.current.startY = e.clientY - position.y;
+    onBinClick(id);
   };
 
   const handleMouseMove = useCallback((e) => {
@@ -50,7 +67,6 @@ function DraggableObj({ id, containerRef, initialX, initialY, onDragEnd }) {
   const handleMouseUp = useCallback(() => {
     if (isDragging) {
       setIsDragging(false);
-      // Call the onDragEnd prop to send the new position to the parent
       onDragEnd(id, position.x, position.y);
     }
   }, [isDragging, id, position, onDragEnd]);
@@ -75,7 +91,7 @@ function DraggableObj({ id, containerRef, initialX, initialY, onDragEnd }) {
       style={objStyle}
       onMouseDown={handleMouseDown}
     >
-      <img src={trashBinImage} alt="Trash Bin" style={{ width: '50px', height: '50px', pointerEvents: 'none' }} />
+      <img src={trashBinImage} alt="Trash Bin" style={imgStyle} />
     </div>
   );
 }

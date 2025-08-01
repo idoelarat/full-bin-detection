@@ -1,65 +1,137 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import DraggableObj from "./DraggableObj";
 
+const MAP_WIDTH = 700;
+const MAP_HEIGHT = 600;
+const BIN_SIZE = 50; // The size of the bin image
+
 function MapHolder() {
   const mapHolderRef = useRef(null);
   const [bins, setBins] = useState([]);
-  const [areas, setAreas] = useState([]); // New state to hold area data
+  const [areas, setAreas] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedAreaId, setSelectedAreaId] = useState(null);
+  const [lastClickedBinId, setLastClickedBinId] = useState(null);
 
-  // Use useCallback to memoize the function and ensure it has access to the latest state
-  const updateBinPosition = useCallback(
-    async (binId, newX, newY) => {
-      const binToUpdate = bins.find((bin) => bin.bin_id === binId);
+  const updateBinPosition = useCallback(async (binId, newX, newY) => {
+    const binToUpdate = bins.find(bin => bin.bin_id === binId);
+    if (!binToUpdate) {
+      console.error("Bin not found in state:", binId);
+      return;
+    }
 
-      if (!binToUpdate) {
-        console.error("Bin not found in state:", binId);
-        return;
+    try {
+      const response = await fetch(`http://localhost:3000/api/bins/${binId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          bin_desc: binToUpdate.bin_desc, 
+          area_id: binToUpdate.area_id,
+          x: newX,
+          y: newY,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      setBins(currentBins =>
+        currentBins.map(bin =>
+          bin.bin_id === binId ? { ...bin, x: newX, y: newY } : bin
+        )
+      );
+    } catch (error) {
+      console.error("Error updating bin position:", error);
+    }
+  }, [bins]);
+  
+  const handleDeleteBin = useCallback(async () => {
+    if (!lastClickedBinId) return;
+
+    const confirmDelete = window.confirm("Are you sure you want to delete this bin?");
+    if (!confirmDelete) return;
+
+    try {
+      const response = await fetch(`http://localhost:3000/api/bins/${lastClickedBinId}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      setBins(currentBins => currentBins.filter(bin => bin.bin_id !== lastClickedBinId));
+      setLastClickedBinId(null);
+    } catch (error) {
+      console.error("Error deleting bin:", error);
+    }
+  }, [lastClickedBinId]);
+
+  const handleCreateNewBin = useCallback(async () => {
+    if (!selectedAreaId) {
+      alert("Please select an Area to create a new bin.");
+      return;
+    }
+    
+    const initialX = MAP_WIDTH / 2 - BIN_SIZE / 2;
+    const initialY = MAP_HEIGHT / 2 - BIN_SIZE / 2;
+    const newBinData = {
+      area_id: selectedAreaId,
+      bin_desc: "0", // Initial bin_desc is now "0"
+      x: initialX,
+      y: initialY,
+    };
+
+    try {
+      const response = await fetch("http://localhost:3000/api/bins/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newBinData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      try {
-        const response = await fetch(
-          `http://localhost:3000/api/bins/${binId}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              bin_desc: binToUpdate.bin_desc,
-              area_id: binToUpdate.area_id,
-              x: newX,
-              y: newY,
-            }),
-          }
-        );
+      const newBin = await response.json();
+      setBins(currentBins => [...currentBins, newBin]);
+      setLastClickedBinId(newBin.bin_id);
+    } catch (error) {
+      console.error("Error creating new bin:", error);
+    }
+  }, [selectedAreaId]);
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
+  // New function to update the bin_desc
+  const handleUpdateBinDesc = useCallback(async (newDesc) => {
+    if (!lastClickedBinId) return;
+    
+    const binToUpdate = bins.find(bin => bin.bin_id === lastClickedBinId);
+    if (!binToUpdate) return;
+    
+    try {
+      const response = await fetch(`http://localhost:3000/api/bins/${lastClickedBinId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...binToUpdate, // Send all bin data
+          bin_desc: newDesc, // Update only the description
+        }),
+      });
 
-        setBins((currentBins) =>
-          currentBins.map((bin) =>
-            bin.bin_id === binId ? { ...bin, x: newX, y: newY } : bin
-          )
-        );
-      } catch (error) {
-        console.error("Error updating bin position:", error);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    },
-    [bins]
-  );
 
-  // useEffect for fetching bins
+      setBins(currentBins =>
+        currentBins.map(bin =>
+          bin.bin_id === lastClickedBinId ? { ...bin, bin_desc: newDesc } : bin
+        )
+      );
+    } catch (error) {
+      console.error("Error updating bin description:", error);
+    }
+  }, [lastClickedBinId, bins]);
+
   useEffect(() => {
     fetch("http://localhost:3000/api/bins/")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
+      .then((response) => response.json())
       .then((data) => {
         const sanitizedData = data.map((bin) => ({
           ...bin,
@@ -75,20 +147,13 @@ function MapHolder() {
         setIsLoading(false);
       });
   }, []);
-
-  // New useEffect for fetching areas
+  
   useEffect(() => {
     fetch("http://localhost:3000/api/areas/")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
+      .then((response) => response.json())
       .then((data) => {
         setAreas(data);
         if (data.length > 0) {
-          // Set the initial selected area ID to the first one in the list
           setSelectedAreaId(data[0].area_id);
         }
       })
@@ -99,45 +164,78 @@ function MapHolder() {
   }, []);
 
   const mapHolderStyle = {
-    width: "700px",
-    height: "600px",
+    width: `${MAP_WIDTH}px`,
+    height: `${MAP_HEIGHT}px`,
     border: "2px solid black",
     boxSizing: "border-box",
     position: "relative",
     overflow: "hidden",
   };
 
-  // Wait for both bins and areas to be loaded
   if (isLoading || areas.length === 0) {
     return <div>Loading bins and areas...</div>;
   }
-
-  // Filter the bins based on the selectedAreaId
-  const filteredBins = selectedAreaId
-    ? bins.filter((bin) => bin.area_id === selectedAreaId)
+  
+  const filteredBins = selectedAreaId 
+    ? bins.filter(bin => bin.area_id === selectedAreaId) 
     : bins;
 
   return (
     <>
-      <div style={{ marginBottom: "10px" }}>
-        <label htmlFor="area-select">Filter by Area: </label>
-        <select
-          id="area-select"
-          value={selectedAreaId || ""}
-          onChange={(e) => setSelectedAreaId(parseInt(e.target.value, 10))}
+      <div style={{ marginBottom: '10px', display: 'flex', gap: '10px', alignItems: 'center' }}>
+        <div>
+          <label htmlFor="area-select">Filter by Area: </label>
+          <select
+            id="area-select"
+            value={selectedAreaId || ''}
+            onChange={(e) => {
+                setLastClickedBinId(null);
+                setSelectedAreaId(parseInt(e.target.value, 10));
+              }
+            }
+          >
+            {areas.map(area => (
+              <option key={area.area_id} value={area.area_id}>
+                {area.area_description}
+              </option>
+            ))}
+          </select>
+        </div>
+        <button 
+          onClick={handleDeleteBin}
+          disabled={!lastClickedBinId}
+          style={{ cursor: lastClickedBinId ? 'pointer' : 'not-allowed' }}
         >
-          {areas.map((area) => (
-            <option key={area.area_id} value={area.area_id}>
-              {area.area_description}{" "}
-              {/* This is where the area description is displayed */}
-            </option>
-          ))}
-        </select>
+          מחק את הפח
+        </button>
+        <button 
+          onClick={handleCreateNewBin}
+          disabled={!selectedAreaId}
+          style={{ cursor: selectedAreaId ? 'pointer' : 'not-allowed' }}
+        >
+          צור פח חדש
+        </button>
+        {/* New buttons to change bin_desc */}
+        <button 
+          onClick={() => handleUpdateBinDesc("0")}
+          disabled={!lastClickedBinId}
+          style={{ cursor: lastClickedBinId ? 'pointer' : 'not-allowed', backgroundColor: 'green', color: 'white' }}
+        >
+          פח ריק
+        </button>
+        <button 
+          onClick={() => handleUpdateBinDesc("1")}
+          disabled={!lastClickedBinId}
+          style={{ cursor: lastClickedBinId ? 'pointer' : 'not-allowed', backgroundColor: 'red', color: 'white' }}
+        >
+          פח מלא
+        </button>
       </div>
       <div
         ref={mapHolderRef}
         className="map-holder-container"
         style={mapHolderStyle}
+        onMouseDown={() => setLastClickedBinId(null)}
       >
         {filteredBins.length > 0 ? (
           filteredBins.map((bin) => (
@@ -148,6 +246,9 @@ function MapHolder() {
               initialY={bin.y}
               containerRef={mapHolderRef}
               onDragEnd={updateBinPosition}
+              onBinClick={() => setLastClickedBinId(bin.bin_id)}
+              isClicked={bin.bin_id === lastClickedBinId}
+              binDesc={bin.bin_desc} // Pass the bin_desc prop
             />
           ))
         ) : (
