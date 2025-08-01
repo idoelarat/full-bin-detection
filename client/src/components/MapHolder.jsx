@@ -1,9 +1,12 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import DraggableObj from "./DraggableObj";
 
-const MAP_WIDTH = 700;
-const MAP_HEIGHT = 600;
-const BIN_SIZE = 50; // The size of the bin image
+const MAP_WIDTH = 1200;
+const MAP_HEIGHT = 800;
+const BIN_SIZE_PIXELS = 50;
+
+const areaImages = import.meta.glob('../assets/areas/*.(png|jpg|jpeg|gif|svg|webp)', { eager: true });
+console.log("Files found by Vite:", areaImages);
 
 function MapHolder() {
   const mapHolderRef = useRef(null);
@@ -12,6 +15,7 @@ function MapHolder() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedAreaId, setSelectedAreaId] = useState(null);
   const [lastClickedBinId, setLastClickedBinId] = useState(null);
+  const [mapImage, setMapImage] = useState(null);
 
   const updateBinPosition = useCallback(async (binId, newX, newY) => {
     const binToUpdate = bins.find(bin => bin.bin_id === binId);
@@ -19,7 +23,7 @@ function MapHolder() {
       console.error("Bin not found in state:", binId);
       return;
     }
-
+    
     try {
       const response = await fetch(`http://localhost:3000/api/bins/${binId}`, {
         method: "PUT",
@@ -70,11 +74,11 @@ function MapHolder() {
       return;
     }
     
-    const initialX = MAP_WIDTH / 2 - BIN_SIZE / 2;
-    const initialY = MAP_HEIGHT / 2 - BIN_SIZE / 2;
+    const initialX = MAP_WIDTH / 2 - BIN_SIZE_PIXELS / 2;
+    const initialY = MAP_HEIGHT / 2 - BIN_SIZE_PIXELS / 2;
     const newBinData = {
       area_id: selectedAreaId,
-      bin_desc: "0", // Initial bin_desc is now "0"
+      bin_desc: "0",
       x: initialX,
       y: initialY,
     };
@@ -85,11 +89,9 @@ function MapHolder() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newBinData),
       });
-
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
       const newBin = await response.json();
       setBins(currentBins => [...currentBins, newBin]);
       setLastClickedBinId(newBin.bin_id);
@@ -98,7 +100,6 @@ function MapHolder() {
     }
   }, [selectedAreaId]);
 
-  // New function to update the bin_desc
   const handleUpdateBinDesc = useCallback(async (newDesc) => {
     if (!lastClickedBinId) return;
     
@@ -110,15 +111,13 @@ function MapHolder() {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...binToUpdate, // Send all bin data
-          bin_desc: newDesc, // Update only the description
+          ...binToUpdate,
+          bin_desc: newDesc,
         }),
       });
-
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
       setBins(currentBins =>
         currentBins.map(bin =>
           bin.bin_id === lastClickedBinId ? { ...bin, bin_desc: newDesc } : bin
@@ -162,14 +161,49 @@ function MapHolder() {
         setAreas([]);
       });
   }, []);
+  
+  useEffect(() => {
+    if (selectedAreaId && areas.length > 0) {
+      const selectedArea = areas.find(area => area.area_id === selectedAreaId);
+      
+      console.log("Selected Area Data:", selectedArea);
+      
+      if (selectedArea && selectedArea.img_path) {
+        const filename = selectedArea.img_path.split(/[\\/]/).pop();
+        
+        console.log("Extracted Filename:", filename);
+
+        const imagePath = `../assets/areas/${filename}`;
+        const imageModule = areaImages[imagePath];
+        
+        console.log("Imported Image Module:", imageModule);
+
+        if (imageModule) {
+          setMapImage(imageModule.default);
+        } else {
+          console.error(`Image with filename '${filename}' not found in assets.`);
+          setMapImage(null);
+        }
+      } else {
+        setMapImage(null);
+      }
+    }
+  }, [selectedAreaId, areas]);
 
   const mapHolderStyle = {
-    width: `${MAP_WIDTH}px`,
+        width: `${MAP_WIDTH}px`,
     height: `${MAP_HEIGHT}px`,
+    position: "relative",
     border: "2px solid black",
     boxSizing: "border-box",
-    position: "relative",
     overflow: "hidden",
+    backgroundImage: mapImage ? `url(${mapImage})` : 'none',
+    
+    // Change this line:
+    backgroundSize: 'contain',
+    
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
   };
 
   if (isLoading || areas.length === 0) {
@@ -184,7 +218,7 @@ function MapHolder() {
     <>
       <div style={{ marginBottom: '10px', display: 'flex', gap: '10px', alignItems: 'center' }}>
         <div>
-          <label htmlFor="area-select">Filter by Area: </label>
+          <label htmlFor="area-select">בחר איזור: </label>
           <select
             id="area-select"
             value={selectedAreaId || ''}
@@ -206,16 +240,15 @@ function MapHolder() {
           disabled={!lastClickedBinId}
           style={{ cursor: lastClickedBinId ? 'pointer' : 'not-allowed' }}
         >
-          מחק את הפח
+          מחק פח
         </button>
         <button 
           onClick={handleCreateNewBin}
           disabled={!selectedAreaId}
           style={{ cursor: selectedAreaId ? 'pointer' : 'not-allowed' }}
         >
-          צור פח חדש
+          צור פח
         </button>
-        {/* New buttons to change bin_desc */}
         <button 
           onClick={() => handleUpdateBinDesc("0")}
           disabled={!lastClickedBinId}
@@ -248,7 +281,8 @@ function MapHolder() {
               onDragEnd={updateBinPosition}
               onBinClick={() => setLastClickedBinId(bin.bin_id)}
               isClicked={bin.bin_id === lastClickedBinId}
-              binDesc={bin.bin_desc} // Pass the bin_desc prop
+              binDesc={bin.bin_desc}
+              // The responsive props are no longer passed
             />
           ))
         ) : (
