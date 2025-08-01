@@ -1,10 +1,9 @@
-// src/components/DraggableObj.jsx
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 // Import your trash-bin.png image
 import trashBinImage from '../assets/trash-bin.png'; // Make sure the path is correct
 
-function DraggableObj({ initialX, initialY, containerRef }) {
-  const [position, setPosition] = useState({ x: initialX || 0, y: initialY || 0 });
+function DraggableObj({ id, containerRef }) {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
 
   const draggableRef = useRef(null);
@@ -13,17 +12,12 @@ function DraggableObj({ initialX, initialY, containerRef }) {
     position: "absolute",
     top: position.y,
     left: position.x,
-    // Remove padding, background, border, and border-radius as these are for buttons
-    // If you want a background or border for the draggable area around the image, you can add it here
     cursor: "grab",
     zIndex: 10,
     userSelect: "none",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    // Adjust width and height as needed for your image or let the image size dictate it
-    // width: '50px',
-    // height: '50px',
   };
 
   const handleMouseDown = (e) => {
@@ -32,7 +26,7 @@ function DraggableObj({ initialX, initialY, containerRef }) {
     draggableRef.current.startY = e.clientY - position.y;
   };
 
-  const handleMouseMove = (e) => {
+  const handleMouseMove = useCallback((e) => {
     if (!isDragging || !containerRef.current || !draggableRef.current) return;
 
     const containerRect = containerRef.current.getBoundingClientRect();
@@ -47,11 +41,11 @@ function DraggableObj({ initialX, initialY, containerRef }) {
     newY = Math.min(newY, containerRect.height - objRect.height);
 
     setPosition({ x: newX, y: newY });
-  };
+  }, [containerRef, isDragging]);
 
-  const handleMouseUp = () => {
+  const handleMouseUp = useCallback(() => {
     setIsDragging(false);
-  };
+  },[]);
 
   useEffect(() => {
     document.addEventListener("mousemove", handleMouseMove);
@@ -61,7 +55,7 @@ function DraggableObj({ initialX, initialY, containerRef }) {
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isDragging, position, containerRef]);
+  }, [handleMouseMove, handleMouseUp]);
 
   return (
     <div
