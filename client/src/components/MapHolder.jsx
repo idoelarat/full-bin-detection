@@ -198,10 +198,7 @@ function MapHolder() {
     boxSizing: "border-box",
     overflow: "hidden",
     backgroundImage: mapImage ? `url(${mapImage})` : 'none',
-    
-    // Change this line:
     backgroundSize: 'contain',
-    
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',
   };
@@ -286,7 +283,7 @@ function MapHolder() {
             />
           ))
         ) : (
-          <div>No bins found for this area.</div>
+          <div>לא נמצאו פחים באיזור</div>
         )}
       </div>
     </>
