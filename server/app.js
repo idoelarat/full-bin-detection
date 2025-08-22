@@ -2,8 +2,12 @@ import express from "express";
 import db from "./config/db.js";
 import areaRoutes from "./routes/areaRoutes.js";
 import binRoutes from "./routes/binRoutes.js";
+import cors from "cors";
 
 const app = express();
+
+app.use(cors());
+
 app.use(express.json());
 
 //connect to db

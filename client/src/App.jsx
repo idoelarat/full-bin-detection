@@ -1,9 +1,9 @@
 import { useState } from "react";
 import "./App.css";
 import AreasSidebar from "./components/areas/AreasSidebar";
+import MapHolder from './components/mapHolder'
 
 function App() {
-  const [count, setCount] = useState(0);
 
   return (
     <>
@@ -18,8 +18,9 @@ function App() {
           count is {count}
         </button>
       </div>
+    <MapHolder/>
     </>
-  );
+  )
 }
 
-export default App;
+export default App
