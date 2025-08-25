@@ -13,7 +13,7 @@ router.get('/:id', binController.getBinById);
 router.delete('/:id', binController.deleteBin); 
 
 // Update a bin by ID
-router.put('/:id', binController.updateBin);    
+router.put('/:id', binController.updateBin);    
 
 // Create a new bin
 router.post('/', binController.create);

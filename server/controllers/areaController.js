@@ -1,5 +1,6 @@
 // controllers/areaController.js
-import AreaModel from '../models/areaModel.js'; // Import your Area model
+import AreaModel from '../models/areaModel.js';
+import binController from './binController.js'; // Import binController
 
 const AreaController = {
   // Get all areas
@@ -71,18 +72,29 @@ const AreaController = {
     });
   },
 
-  // Delete an area
+  // Delete an area and its associated bins
   deleteArea: (req, res) => {
     const { id } = req.params;
-    AreaModel.delete(id, (err, result) => {
+
+    // First, delete all bins associated with this area
+    binController.deleteBinsByAreaId(id, (err, binResult) => {
       if (err) {
-        console.error('Controller Error: deleting area:', err);
-        return res.status(500).json({ error: 'Failed to delete area' });
+        console.error('Controller Error: deleting bins associated with area:', err);
+        return res.status(500).json({ error: 'Failed to delete bins for the area.' });
       }
-      if (result.affectedRows === 0) {
-        return res.status(404).json({ message: 'Area not found.' });
-      }
-      res.json({ message: 'Area deleted successfully' });
+
+      // If bins were deleted successfully, proceed to delete the area
+      AreaModel.delete(id, (err, areaResult) => {
+        if (err) {
+          console.error('Controller Error: deleting area:', err);
+          return res.status(500).json({ error: 'Failed to delete area' });
+        }
+        if (areaResult.affectedRows === 0) {
+          // This should not happen if bins were just deleted, but it's a good safeguard
+          return res.status(404).json({ message: 'Area not found.' });
+        }
+        res.status(200).json({ message: 'Area and all associated bins deleted successfully' });
+      });
     });
   }
 };

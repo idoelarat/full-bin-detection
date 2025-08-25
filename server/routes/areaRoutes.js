@@ -1,6 +1,6 @@
 // routes/areaRoutes.js
 import express from 'express';
-import AreaController from '../controllers/areaController.js'; // Import your Area controller
+import AreaController from '../controllers/areaController.js';
 
 const router = express.Router();
 

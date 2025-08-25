@@ -118,6 +118,16 @@ const binController = {
       });
     });
   },
+
+  // This is the function that needs to be exported and called
+  deleteBinsByAreaId: (areaId, callback) => {
+    binModel.deleteByAreaId(areaId, (err, result) => {
+      if (err) {
+        console.error("Controller Error: deleting bins by area ID:", err);
+      }
+      callback(err, result);
+    });
+  }
 };
 
 export default binController;

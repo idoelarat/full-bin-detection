@@ -1,5 +1,5 @@
 import './App.css'
-import MapHolder from './components/mapHolder'
+import MapHolder from './components/MapHolder'
 
 function App() {
 

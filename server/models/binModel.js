@@ -1,3 +1,4 @@
+// models/binModel.js
 import db from "../config/db.js";
 
 const binModel = {
@@ -29,6 +30,12 @@ const binModel = {
       INSERT INTO bins (bin_desc, area_id, x, y)
       VALUES (?, ?, ?, ?)`;
     db.query(sql, [bin_desc, area_id, x, y], callback);
+  },
+
+  // NEW FUNCTION: Delete all bins for a given area ID
+  deleteByAreaId: (areaId, callback) => {
+    const sql = "DELETE FROM bins WHERE area_id = ?";
+    db.query(sql, [areaId], callback);
   },
 };
 
