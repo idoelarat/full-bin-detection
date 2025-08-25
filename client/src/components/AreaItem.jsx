@@ -3,10 +3,10 @@ import React from "react";
 
 /**
  * Props:
- * - area: { area_id: number, area_name: string, ... }
+ * - area: { area_id: number, area_description: string, ... }
  * - isSelected: boolean
  * - onClick: () => void
- * - tabIndex?: number        // לברירת מחדל 0/-1 לפי Sidebar
+ * - tabIndex?: number    // For default 0/-1 based on Sidebar
  * - buttonRef?: (el: HTMLButtonElement | null) => void
  */
 export default function AreaItem({ area, isSelected = false, onClick, tabIndex = -1, buttonRef }) {
@@ -22,7 +22,7 @@ export default function AreaItem({ area, isSelected = false, onClick, tabIndex =
         aria-selected={isSelected}
         tabIndex={tabIndex}
       >
-        {area.area_name}
+        {area.area_description}
       </button>
     </div>
   );

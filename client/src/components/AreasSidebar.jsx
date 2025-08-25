@@ -4,23 +4,23 @@ import AreaItem from "./AreaItem.jsx";
 
 /**
  * Props:
- * - areas: Array<{ area_id: number, area_name: string, ... }>
+ * - areas: Array<{ area_id: number, area_description: string, ... }>
  * - selectedId: number | null
  * - onSelect: (area_id: number) => void
- * - sortMode?: "name-asc" | "name-desc" | "id-asc" | "id-desc"
+ * - sortMode?: "description-asc" | "description-desc" | "id-asc" | "id-desc"
  */
 export default function AreasSidebar({
   areas = [],
   selectedId = null,
   onSelect = () => {},
-  sortMode = "name-asc",
+  sortMode = "description-asc",
 }) {
-  // Basic validation: area_name is required
+  // Basic validation: area_description is required
   useEffect(() => {
     for (const a of areas) {
-      if (!a || a.area_id == null || typeof a.area_name !== "string" || !a.area_name.trim()) {
+      if (!a || a.area_id == null || typeof a.area_description !== "string" || !a.area_description.trim()) {
         // Don't stop the app, just warn to show what's missing
-        console.warn("AreasSidebar: Each item must include area_id and a non-empty area_name:", a);
+        console.warn("AreasSidebar: Each item must include area_id and a non-empty area_description:", a);
       }
     }
   }, [areas]);
@@ -28,17 +28,17 @@ export default function AreasSidebar({
   // Sort based on sortMode, without modifying the original array
   const sorted = useMemo(() => {
     const copy = [...areas];
-    const cmpNameAsc  = (x, y) => x.area_name.localeCompare(y.area_name, "he", { numeric: true, sensitivity: "base" });
-    const cmpNameDesc = (x, y) => -cmpNameAsc(x, y);
-    const cmpIdAsc    = (x, y) => (x.area_id ?? 0) - (y.area_id ?? 0);
-    const cmpIdDesc   = (x, y) => -cmpIdAsc(x, y);
+    const cmpDescAsc = (x, y) => x.area_description.localeCompare(y.area_description, "he", { numeric: true, sensitivity: "base" });
+    const cmpDescDesc = (x, y) => -cmpDescAsc(x, y);
+    const cmpIdAsc = (x, y) => (x.area_id ?? 0) - (y.area_id ?? 0);
+    const cmpIdDesc = (x, y) => -cmpIdAsc(x, y);
 
     switch (sortMode) {
-      case "name-desc": return copy.sort(cmpNameDesc);
-      case "id-asc":    return copy.sort(cmpIdAsc);
-      case "id-desc":   return copy.sort(cmpIdDesc);
-      case "name-asc":
-      default:          return copy.sort(cmpNameAsc);
+      case "description-desc": return copy.sort(cmpDescDesc);
+      case "id-asc": return copy.sort(cmpIdAsc);
+      case "id-desc": return copy.sort(cmpIdDesc);
+      case "description-asc":
+      default: return copy.sort(cmpDescAsc);
     }
   }, [areas, sortMode]);
 
@@ -101,7 +101,7 @@ export default function AreasSidebar({
         <div>No areas</div>
       ) : (
         sorted.map((area, i) => {
-          const id = Number(area.area_id ?? area.id);  // Support area_id or id
+          const id = Number(area.area_id ?? area.id); // Support area_id or id
           const isSelected = Number(selectedId) === id;
           return (
             <AreaItem
