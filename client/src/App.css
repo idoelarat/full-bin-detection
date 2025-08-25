@@ -1,3 +1,4 @@
+/* App.css */
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -52,20 +53,49 @@
 }
 
 .container-button {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
   border: 1px solid #ccc;
   border-radius: 8px;
-  padding: 10px;
   margin: 3px;
   background-color: #f9f9f9;
-  user-select: none;
-  cursor: pointer;
-  transition: transform 80ms ease;
-  transform: translateY(15px);
+  padding: 6px;              
 }
 
+/* Hover effect on the wrapper (not the button itself) */
 .container-button:hover {
   background-color: #ceebe7aa;
+}
+
+/* The button itself - completely reset the browser's default appearance */
+.area-button {
+  display: block;
+  width: 100%;
+  text-align: center;         /* RTL */
+  padding: 10px 12px;
+  background: transparent;   /* No background - shows the wrapper's background */
+  border: 0;                 /* No default border */
+  appearance: none;          /* Reset browser appearance */
+  -webkit-appearance: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* Accessible and visually pleasing focus (only when navigating with the keyboard) */
+.area-button:focus-visible {
+  outline: 2px solid #6cd5c0; 
+  outline-offset: 2px;
+}
+
+.container-button.is-selected { background-color: #dff7f2; }
+.area-button.is-selected { outline: 2px solid #16a085; outline-offset: 2px; }
+
+/* Sidebar scrolling and internal boundaries */
+.areas-sidebar {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+/* Align text to the right */
+.area-button {
+  text-align: right;
 }
