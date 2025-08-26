@@ -35,10 +35,11 @@ export default function AreasControlButtons({
     setPlusError(null);
     setOpen(true);
   };
-  const handleClose = () => { if (!saving) setOpen(false); };
+  const handleClose = () => {
+    if (!saving) setOpen(false);
+  };
 
   const [formData, setFormData] = useState({
-    areaName: "",
     areaDescription: "",
     imageUrl: "",
   });
@@ -49,7 +50,10 @@ export default function AreasControlButtons({
   };
 
   const isValid = useMemo(
-    () => Object.values(formData).every((v) => typeof v === "string" && v.trim() !== ""),
+    () =>
+      Object.values(formData).every(
+        (v) => typeof v === "string" && v.trim() !== ""
+      ),
     [formData]
   );
 
@@ -62,13 +66,12 @@ export default function AreasControlButtons({
       setPlusError(null);
 
       const payload = {
-        area_name: formData.areaName.trim(),
         area_description: formData.areaDescription.trim(),
         img_path: formData.imageUrl.trim(),
       };
 
       await onCreate(payload); // Call the prop function
-      setFormData({ areaName: "", areaDescription: "", imageUrl: "" });
+      setFormData({ areaDescription: "", imageUrl: "" });
       setOpen(false);
     } catch (err) {
       console.error("Create area failed:", err);
@@ -87,12 +90,15 @@ export default function AreasControlButtons({
     setMinusError(null);
     setConfirmOpen(true);
   };
-  const closeConfirm = () => { if (!deleting) setConfirmOpen(false); };
+  const closeConfirm = () => {
+    if (!deleting) setConfirmOpen(false);
+  };
 
-  const areaLabel =
-    deleteTargetArea?.area_description?.trim()
-      ? `"${deleteTargetArea.area_description}"`
-      : (deleteTargetId != null ? `Area #${deleteTargetId}` : "this area");
+  const areaLabel = deleteTargetArea?.area_description?.trim()
+    ? `"${deleteTargetArea.area_description}"`
+    : deleteTargetId != null
+    ? `Area #${deleteTargetId}`
+    : "this area";
 
   const handleConfirmDelete = async () => {
     if (!deleteTargetId || deleting) return;
@@ -133,18 +139,20 @@ export default function AreasControlButtons({
         >
           <FaPlus size={22} />
         </IconButton>
-        
+
         {/* Conditional message when no areas exist */}
         {!hasAreas && (
           <Box
             sx={{
-              display: 'flex',
-              alignItems: 'center',
+              display: "flex",
+              alignItems: "center",
               ml: 1,
             }}
           >
-            <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-            </Typography>
+            <Typography
+              variant="body1"
+              sx={{ color: "text.secondary" }}
+            ></Typography>
           </Box>
         )}
 
@@ -164,67 +172,44 @@ export default function AreasControlButtons({
       <Modal open={open} onClose={handleClose}>
         <Fade in={open} timeout={200}>
           <div style={modalStyle}>
-            <h2 style={{ color: "#111", margin: 0, marginBottom: 16 }}>
-              Add a New Area
+            <h2
+              style={{ color: "#111", margin: 0, marginBottom: 16 }}
+              dir="rtl"
+            >
+              הוספת אזור חדש
             </h2>
-            {plusError && <p style={{ color: "crimson" }}>Error: {plusError}</p>}
+            {plusError && (
+              <p style={{ color: "crimson" }}>Error: {plusError}</p>
+            )}
             <form onSubmit={handleSave} noValidate>
               <Stack direction="column" spacing={1.5}>
                 <TextField
-                  name="areaName"
-                  label="Area Name"
-                  value={formData.areaName}
-                  onChange={handleChange}
-                  fullWidth
-                  autoFocus
-                  required
-                  disabled={saving}
-                />
-
-                <TextField
                   name="areaDescription"
-                  label="Area Description"
+                  label="הוספת תיאור"
                   value={formData.areaDescription}
                   onChange={handleChange}
                   fullWidth
+                  variant="standard"
                   multiline
-                  rows={3}
                   required
                   disabled={saving}
+                  inputProps={{ dir: "rtl" }}
+                  InputLabelProps={{ sx: { left: "unset", right: 0 } }}
                 />
 
                 <TextField
                   name="imageUrl"
-                  label="Image URL"
+                  label="כתובת לתמונה"
                   value={formData.imageUrl}
                   onChange={handleChange}
                   fullWidth
+                  variant="standard"
                   required
                   disabled={saving}
+                  InputLabelProps={{ sx: { left: "unset", right: 0 } }}
                 />
 
                 <Stack direction="row" spacing={1.25} justifyContent="flex-end">
-                  {/* Save */}
-                  <motion.div
-                    variants={enterVariants}
-                    initial="hidden"
-                    animate="visible"
-                    transition={{ duration: 0.25 }}
-                    whileHover="hover"
-                    whileTap="tap"
-                  >
-                    <motion.div variants={interactVariants}>
-                      <Button
-                        type="submit"
-                        variant="contained"
-                        disabled={!isValid || saving}
-                        sx={{ textTransform: "none", color: "white", backgroundColor: "green" }}
-                      >
-                        {saving ? "Saving..." : "Save"}
-                      </Button>
-                    </motion.div>
-                  </motion.div>
-
                   {/* Cancel */}
                   <motion.div
                     variants={enterVariants}
@@ -240,9 +225,37 @@ export default function AreasControlButtons({
                         variant="contained"
                         onClick={handleClose}
                         disabled={saving}
-                        sx={{ textTransform: "none", color: "white", backgroundColor: "red" }}
+                        sx={{
+                          textTransform: "none",
+                          color: "white",
+                          backgroundColor: "red",
+                        }}
                       >
-                        Cancel
+                        בטל
+                      </Button>
+                    </motion.div>
+                  </motion.div>
+                  {/* Save */}
+                  <motion.div
+                    variants={enterVariants}
+                    initial="hidden"
+                    animate="visible"
+                    transition={{ duration: 0.25 }}
+                    whileHover="hover"
+                    whileTap="tap"
+                  >
+                    <motion.div variants={interactVariants}>
+                      <Button
+                        type="submit"
+                        variant="contained"
+                        disabled={!isValid || saving}
+                        sx={{
+                          textTransform: "none",
+                          color: "white",
+                          backgroundColor: "green",
+                        }}
+                      >
+                        {saving ? "שומר...." : "שמור"}
                       </Button>
                     </motion.div>
                   </motion.div>
@@ -257,35 +270,17 @@ export default function AreasControlButtons({
       <Modal open={confirmOpen} onClose={closeConfirm}>
         <Fade in={confirmOpen} timeout={150}>
           <div style={modalStyle}>
-            <h2 style={{ marginTop: 0, color: "black" }}>Delete area?</h2>
-            {minusError && <p style={{ color: "crimson" }}>Error: {minusError}</p>}
-            <p style={{ margin: "8px 0 16px", color: "black" }}>
-              Are you sure you want to delete area: <b>{areaLabel}</b> ?
+            <h2 style={{ marginTop: 0, color: "black" }} dir="rtl">
+              מחיקת אזור
+            </h2>
+            {minusError && (
+              <p style={{ color: "crimson" }}>Error: {minusError}</p>
+            )}
+            <p style={{ margin: "8px 0 16px", color: "black" }} dir="rtl">
+              למחוק את אזור: <b>{areaLabel}</b> ?
             </p>
 
             <Stack direction="row" spacing={1.25} justifyContent="flex-end">
-              {/* Delete */}
-              <motion.div
-                variants={enterVariants}
-                initial="hidden"
-                animate="visible"
-                transition={{ duration: 0.25 }}
-                whileHover="hover"
-                whileTap="tap"
-              >
-                <motion.div variants={interactVariants}>
-                  <Button
-                    type="button"
-                    variant="contained"
-                    onClick={handleConfirmDelete}
-                    disabled={!hasAreas || deleting}
-                    sx={{ textTransform: "none", backgroundColor: "red" }}
-                  >
-                    {deleting ? "Deleting..." : "Delete"}
-                  </Button>
-                </motion.div>
-              </motion.div>
-
               {/* Cancel */}
               <motion.div
                 variants={enterVariants}
@@ -301,9 +296,38 @@ export default function AreasControlButtons({
                     variant="contained"
                     onClick={closeConfirm}
                     disabled={deleting}
-                    sx={{ textTransform: "none", backgroundColor: "#666" }}
+                    sx={{
+                      textTransform: "none",
+                      backgroundColor: "#666",
+                      dir: "rtl",
+                    }}
                   >
-                    Cancel
+                    בטל
+                  </Button>
+                </motion.div>
+              </motion.div>
+              {/* Delete */}
+              <motion.div
+                variants={enterVariants}
+                initial="hidden"
+                animate="visible"
+                transition={{ duration: 0.25 }}
+                whileHover="hover"
+                whileTap="tap"
+              >
+                <motion.div variants={interactVariants}>
+                  <Button
+                    type="button"
+                    variant="contained"
+                    onClick={handleConfirmDelete}
+                    disabled={!hasAreas || deleting}
+                    sx={{
+                      textTransform: "none",
+                      backgroundColor: "red",
+                      dir: "rtl",
+                    }}
+                  >
+                    {deleting ? "מוחק..." : "מחק"}
                   </Button>
                 </motion.div>
               </motion.div>

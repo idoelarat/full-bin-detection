@@ -10,7 +10,7 @@ const styles = `
 .map-container {
   display: flex;
   gap: 20px;
-  flex-wrap: wrap;
+  flex-direction: row-reverse;
 }
 
 .areas-sidebar {
