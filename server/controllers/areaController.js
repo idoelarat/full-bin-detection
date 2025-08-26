@@ -3,7 +3,6 @@ import AreaModel from "../models/areaModel.js";
 import binController from "./binController.js";
 
 const AreaController = {
-  // Get all areas
   getAllAreas: (req, res) => {
     AreaModel.getAll((err, results) => {
       if (err) {
@@ -14,7 +13,6 @@ const AreaController = {
     });
   },
 
-  // Get a single area by ID
   getAreaById: (req, res) => {
     const { id } = req.params;
     AreaModel.getById(id, (err, results) => {
@@ -29,11 +27,9 @@ const AreaController = {
     });
   },
 
-  // Create a new area
   createArea: (req, res) => {
     const areaData = req.body;
 
-    // Add validation for area_name
     if (!areaData.area_name) {
       return res.status(400).json({ error: "Area name is required." });
     }
@@ -54,12 +50,10 @@ const AreaController = {
     });
   },
 
-  // Update an existing area
   updateArea: (req, res) => {
     const { id } = req.params;
     const areaData = req.body;
 
-    // Add validation for area_name
     if (!areaData.area_name) {
       return res.status(400).json({ error: "Area name is required." });
     }
@@ -81,7 +75,6 @@ const AreaController = {
     });
   },
 
-  // Delete an area and its associated bins
   deleteArea: (req, res) => {
     const { id } = req.params;
 

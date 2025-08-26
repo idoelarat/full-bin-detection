@@ -160,7 +160,7 @@ function MapHolder() {
 
     // Clean up event listener
     return () => window.removeEventListener("resize", updateDimensions);
-  }, []); // Run only on mount and unmount
+  }, []); 
 
   useEffect(() => {
     if (areas.length > 0 && selectedAreaId === null) {
@@ -168,8 +168,6 @@ function MapHolder() {
     }
   }, [areas, selectedAreaId, setSelectedAreaId]);
 
-  // The mapHolderStyle object now only contains the background image property
-  // as the dimensions are controlled by the .map-holder-container CSS class.
   const mapHolderStyle = {
     backgroundImage: mapImage ? `url(${mapImage})` : "none",
   };
@@ -185,7 +183,7 @@ function MapHolder() {
   // This is the new function that sets both states
   const handleSelectArea = (areaId) => {
     setSelectedAreaId(areaId);
-    setLastClickedBinId(null); // This is the key change!
+    setLastClickedBinId(null);
   };
 
   return (
@@ -209,7 +207,7 @@ function MapHolder() {
           <AreasSidebar
             areas={areas}
             selectedId={selectedAreaId}
-            onSelect={handleSelectArea} // Use the new handler here
+            onSelect={handleSelectArea}
             sortMode="id-asc"
           />
         </div>
@@ -217,8 +215,6 @@ function MapHolder() {
         {/* The map view wrapper that will fill available space */}
         <div className="map-view-wrapper">
           <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-            {/* The rest of your existing UI elements */}
-
             <button
               onClick={() => handleUpdateBinDesc("0")}
               disabled={!lastClickedBinId}
@@ -274,7 +270,7 @@ function MapHolder() {
                   onBinClick={() => setLastClickedBinId(bin.bin_id)}
                   isClicked={bin.bin_id === lastClickedBinId}
                   binDesc={bin.bin_desc}
-                  mapDimensions={mapDimensions} // Pass the map dimensions
+                  mapDimensions={mapDimensions}
                 />
               ))
             ) : (

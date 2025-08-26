@@ -1,7 +1,6 @@
 import binModel from "../models/binModel.js";
 
 const binController = {
-  // Get all bins
   getAllBins: (req, res) => {
     console.log("📡 /api/bins route called");
 
@@ -14,7 +13,6 @@ const binController = {
     });
   },
 
-  // Get a single bin by ID
   getBinById: (req, res) => {
     const { id } = req.params;
     binModel.getById(id, (err, results) => {
@@ -29,7 +27,6 @@ const binController = {
     });
   },
 
-  // Delete a bin by ID
   deleteBin: (req, res) => {
     const { id } = req.params;
     binModel.delete(id, (err, results) => {
@@ -77,18 +74,6 @@ const binController = {
       return res.status(400).json({ error: "area_id is required." });
     }
 
-    // Validate x coordinate (optional, but if present, must be a number or null)
-    if (
-      binData.x !== undefined &&
-      binData.x !== null &&
-      typeof binData.x !== "number"
-    ) {
-      return res
-        .status(400)
-        .json({ error: "x must be a number or null if provided." });
-    }
-
-    // Validate y coordinate (optional, but if present, must be a number or null)
     if (
       binData.y !== undefined &&
       binData.y !== null &&
@@ -119,7 +104,6 @@ const binController = {
     });
   },
 
-  // This is the function that needs to be exported and called
   deleteBinsByAreaId: (areaId, callback) => {
     binModel.deleteByAreaId(areaId, (err, result) => {
       if (err) {
@@ -127,7 +111,7 @@ const binController = {
       }
       callback(err, result);
     });
-  }
+  },
 };
 
 export default binController;

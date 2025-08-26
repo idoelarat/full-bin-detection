@@ -40,7 +40,7 @@ export default function AreasControlButtons({
   };
 
   const [formData, setFormData] = useState({
-    areaName: "", // Add a new state field for area name
+    areaName: "",
     areaDescription: "",
     imageUrl: "",
   });
@@ -66,15 +66,13 @@ export default function AreasControlButtons({
       setSaving(true);
       setPlusError(null);
 
-      // Add area_name to the payload
       const payload = {
-        area_name: formData.areaName.trim(), // Include the new field
+        area_name: formData.areaName.trim(),
         area_description: formData.areaDescription.trim(),
         img_path: formData.imageUrl.trim(),
       };
 
-      await onCreate(payload); // Call the prop function
-      // Reset the form data after successful creation
+      await onCreate(payload);
       setFormData({ areaName: "", areaDescription: "", imageUrl: "" });
       setOpen(false);
     } catch (err) {
@@ -112,7 +110,7 @@ export default function AreasControlButtons({
     try {
       setDeleting(true);
       setMinusError(null);
-      await onDelete(deleteTargetId); // Call the prop function
+      await onDelete(deleteTargetId);
       setConfirmOpen(false);
     } catch (err) {
       console.error("Delete area failed:", err);
@@ -190,10 +188,9 @@ export default function AreasControlButtons({
             )}
             <form onSubmit={handleSave} noValidate>
               <Stack direction="column" spacing={1.5}>
-                {/* New TextField for Area Name */}
                 <TextField
                   name="areaName"
-                  label="שם אזור" // Label in Hebrew for Area Name
+                  label="שם אזור"
                   value={formData.areaName}
                   onChange={handleChange}
                   fullWidth
