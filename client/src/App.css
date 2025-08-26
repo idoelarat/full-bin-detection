@@ -1,8 +1,7 @@
 #root {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  padding: 0;
 }
 
 .logo {
@@ -39,4 +38,36 @@
 
 .read-the-docs {
   color: #888;
+}
+
+.app-header {
+  background-color: #333;
+  color: white;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 2.5rem;
+}
+
+/* Default margin for small screens (mobile) */
+.content-wrapper {
+  margin-top: 8rem;
+  text-align: center;
+}
+
+/* Adjust margin for medium screens (tablets and small desktops) */
+@media (min-width: 768px) {
+  .content-wrapper {
+    margin-top: 4rem;
+  }
+}
+
+.content-wrapper {
+  /* This will set the margin to 5% of the viewport's height */
+  margin-top: 5vh; 
+  text-align: center;
 }

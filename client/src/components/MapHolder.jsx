@@ -1,25 +1,46 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import DraggableObj from "./DraggableObj";
 import AreasControlButtons from "./AreasControlButtons";
 import AreasSidebar from "./AreasSidebar"; // New: Import AreasSidebar
 import useBins from "../hooks/useBins";
 import useAreas from "../hooks/useAreas";
 
-// This CSS is added to support the new AreasSidebar and AreaItem components.
+// This CSS now uses a combination of properties for fluid, aspect-ratio-locked sizing.
 const styles = `
 .map-container {
   display: flex;
   gap: 20px;
-  flex-direction: row-reverse;
+  flex-direction: row-reverse; /* Default for desktop */
+  flex-wrap: wrap; /* Allows elements to wrap on smaller screens */
+  justify-content: center; /* Centers content when wrapped */
+}
+
+/* Media query for small screens (e.g., mobile devices) */
+@media (max-width: 768px) {
+  .map-container {
+    flex-direction: column; /* Stack elements vertically */
+    align-items: center; /* Center them horizontally */
+  }
+}
+
+.areas-sidebar-wrapper {
+  flex-shrink: 0;
+  width: 250px; /* fixed width for the sidebar on desktop */
 }
 
 .areas-sidebar {
-  width: 250px; /* fixed width for the sidebar */
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 10px;
   background-color: #f9f9f9;
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  box-sizing: border-box; /* Ensures padding and border are included in the width */
+}
+
+@media (max-width: 768px) {
+  .areas-sidebar-wrapper {
+    width: 100%; /* Take full width on mobile */
+  }
 }
 
 .area-button {
@@ -59,14 +80,44 @@ const styles = `
   margin-bottom: 8px;
   border-radius: 6px;
 }
+
+/*
+The map holder container is now fluid within its max dimensions,
+maintaining a 10:8 aspect ratio.
+*/
+.map-holder-container {
+  width: 100%;
+  max-width: 1000px;
+  max-height: 800px;
+  aspect-ratio: 1000 / 800;
+  position: relative;
+  border: 2px solid black;
+  box-sizing: border-box;
+  overflow: hidden;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.map-view-wrapper {
+  flex: 1; /* This wrapper now also takes up the remaining space */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center; /* Center the map within this wrapper */
+}
 `;
 
-const MAP_WIDTH = 1200;
-const MAP_HEIGHT = 800;
 const BIN_SIZE_PIXELS = 50;
+const ORIGINAL_WIDTH = 1000;
+const ORIGINAL_HEIGHT = 800;
 
 function MapHolder() {
   const mapHolderRef = useRef(null);
+  
+  // State to hold the dynamic dimensions of the map container
+  const [mapDimensions, setMapDimensions] = useState({ width: ORIGINAL_WIDTH, height: ORIGINAL_HEIGHT });
+
   const { 
     areas, 
     selectedAreaId, 
@@ -77,6 +128,7 @@ function MapHolder() {
     deleteArea,
   } = useAreas();
   
+  // Pass the dynamic dimensions to the useBins hook
   const {
     bins,
     lastClickedBinId,
@@ -85,25 +137,39 @@ function MapHolder() {
     handleDeleteBin,
     handleCreateNewBin,
     handleUpdateBinDesc,
-  } = useBins(selectedAreaId, MAP_WIDTH, MAP_HEIGHT, BIN_SIZE_PIXELS);
+  } = useBins(selectedAreaId, ORIGINAL_WIDTH, ORIGINAL_HEIGHT, BIN_SIZE_PIXELS);
   
+  // Effect to update dimensions on component mount and window resize
+  useEffect(() => {
+    const updateDimensions = () => {
+      if (mapHolderRef.current) {
+        setMapDimensions({
+          width: mapHolderRef.current.offsetWidth,
+          height: mapHolderRef.current.offsetHeight,
+        });
+      }
+    };
+
+    // Set initial dimensions
+    updateDimensions();
+
+    // Add event listener for window resize
+    window.addEventListener('resize', updateDimensions);
+
+    // Clean up event listener
+    return () => window.removeEventListener('resize', updateDimensions);
+  }, []); // Run only on mount and unmount
+
   useEffect(() => {
     if (areas.length > 0 && selectedAreaId === null) {
       setSelectedAreaId(areas[0].area_id);
     }
   }, [areas, selectedAreaId, setSelectedAreaId]);
   
+  // The mapHolderStyle object now only contains the background image property
+  // as the dimensions are controlled by the .map-holder-container CSS class.
   const mapHolderStyle = {
-    width: `${MAP_WIDTH}px`,
-    height: `${MAP_HEIGHT}px`,
-    position: "relative",
-    border: "2px solid black",
-    boxSizing: "border-box",
-    overflow: "hidden",
     backgroundImage: mapImage ? `url(${mapImage})` : 'none',
-    backgroundSize: 'contain',
-    backgroundPosition: 'center',
-    backgroundRepeat: 'no-repeat',
   };
 
   if (isLoading) {
@@ -118,8 +184,8 @@ function MapHolder() {
     <>
       <style>{styles}</style>
       <div className="map-container">
-        {/* New component for area controls */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        {/* New wrapper for area controls to manage flex-sizing */}
+        <div className="areas-sidebar-wrapper" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <AreasControlButtons
             onCreate={createArea}
             onDelete={deleteArea}
@@ -137,8 +203,8 @@ function MapHolder() {
           />
         </div>
 
-        {/* The map view */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        {/* The map view wrapper that will fill available space */}
+        <div className="map-view-wrapper">
           <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
             {/* The rest of your existing UI elements */}
             <button 
@@ -188,6 +254,7 @@ function MapHolder() {
                   onBinClick={() => setLastClickedBinId(bin.bin_id)}
                   isClicked={bin.bin_id === lastClickedBinId}
                   binDesc={bin.bin_desc}
+                  mapDimensions={mapDimensions} // Pass the map dimensions
                 />
               ))
             ) : (

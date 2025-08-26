@@ -12,6 +12,7 @@ function DraggableObj({
   onBinClick, 
   isClicked, 
   binDesc,
+  mapDimensions, // Added mapDimensions prop
 }) {
   // A safety check to ensure initial coordinates are numbers, defaulting to 0 if not.
   const safeX = typeof initialX === 'number' ? initialX : 0;
@@ -25,6 +26,22 @@ function DraggableObj({
   // A ref to get a direct reference to the DOM element for calculating its position and dimensions.
   // It also stores the initial mouse position (startX, startY) relative to the object.
   const draggableRef = useRef(null);
+
+  // Defines the original dimensions of the map for calculating relative positions.
+  const ORIGINAL_MAP_WIDTH = 1000;
+  const ORIGINAL_MAP_HEIGHT = 800;
+
+  // This effect recalculates the bin's position whenever the map's dimensions change.
+  // It uses the bin's initial pixel position to find its equivalent percentage position,
+  // then converts that back to pixels based on the new map size.
+  useEffect(() => {
+    if (mapDimensions.width > 0 && mapDimensions.height > 0) {
+      // Calculate the new position based on the ratio of the initial position to the original map size.
+      const newX = (safeX / ORIGINAL_MAP_WIDTH) * mapDimensions.width;
+      const newY = (safeY / ORIGINAL_MAP_HEIGHT) * mapDimensions.height;
+      setPosition({ x: newX, y: newY });
+    }
+  }, [safeX, safeY, mapDimensions]); // Depend on initial coords and map dimensions
 
   // Determines the CSS filter to apply to the trash bin image based on its 'binDesc' value.
   // This changes the color of the bin (e.g., green for "0", red for "1").
@@ -119,12 +136,6 @@ function DraggableObj({
     };
   }, [handleMouseMove, handleMouseUp]);
   
-  // This effect synchronizes the component's internal position state with the `initialX` and `initialY` props.
-  // It ensures the component's position updates if the parent re-renders with new coordinates (e.g., on first load or an area change).
-  useEffect(() => {
-    setPosition({ x: initialX, y: initialY });
-  }, [initialX, initialY]);
-
   // Renders the draggable element.
   return (
     <div
