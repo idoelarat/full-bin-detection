@@ -40,6 +40,7 @@ export default function AreasControlButtons({
   };
 
   const [formData, setFormData] = useState({
+    areaName: "", // Add a new state field for area name
     areaDescription: "",
     imageUrl: "",
   });
@@ -65,13 +66,16 @@ export default function AreasControlButtons({
       setSaving(true);
       setPlusError(null);
 
+      // Add area_name to the payload
       const payload = {
+        area_name: formData.areaName.trim(), // Include the new field
         area_description: formData.areaDescription.trim(),
         img_path: formData.imageUrl.trim(),
       };
 
       await onCreate(payload); // Call the prop function
-      setFormData({ areaDescription: "", imageUrl: "" });
+      // Reset the form data after successful creation
+      setFormData({ areaName: "", areaDescription: "", imageUrl: "" });
       setOpen(false);
     } catch (err) {
       console.error("Create area failed:", err);
@@ -94,7 +98,10 @@ export default function AreasControlButtons({
     if (!deleting) setConfirmOpen(false);
   };
 
-  const areaLabel = deleteTargetArea?.area_description?.trim()
+  // Update the areaLabel to use area_name first, then area_description
+  const areaLabel = deleteTargetArea?.area_name?.trim()
+    ? `"${deleteTargetArea.area_name}"`
+    : deleteTargetArea?.area_description?.trim()
     ? `"${deleteTargetArea.area_description}"`
     : deleteTargetId != null
     ? `Area #${deleteTargetId}`
@@ -183,6 +190,19 @@ export default function AreasControlButtons({
             )}
             <form onSubmit={handleSave} noValidate>
               <Stack direction="column" spacing={1.5}>
+                {/* New TextField for Area Name */}
+                <TextField
+                  name="areaName"
+                  label="שם אזור" // Label in Hebrew for Area Name
+                  value={formData.areaName}
+                  onChange={handleChange}
+                  fullWidth
+                  variant="standard"
+                  required
+                  disabled={saving}
+                  inputProps={{ dir: "rtl" }}
+                  InputLabelProps={{ sx: { left: "unset", right: 0 } }}
+                />
                 <TextField
                   name="areaDescription"
                   label="הוספת תיאור"

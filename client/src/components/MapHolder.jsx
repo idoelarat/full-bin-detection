@@ -104,7 +104,6 @@ maintaining a 10:8 aspect ratio.
   display: flex;
   flex-direction: column;
   gap: 10px;
-  align-items: center; /* Center the map within this wrapper */
 }
 `;
 
@@ -114,20 +113,23 @@ const ORIGINAL_HEIGHT = 800;
 
 function MapHolder() {
   const mapHolderRef = useRef(null);
-  
-  // State to hold the dynamic dimensions of the map container
-  const [mapDimensions, setMapDimensions] = useState({ width: ORIGINAL_WIDTH, height: ORIGINAL_HEIGHT });
 
-  const { 
-    areas, 
-    selectedAreaId, 
-    setSelectedAreaId, 
-    mapImage, 
+  // State to hold the dynamic dimensions of the map container
+  const [mapDimensions, setMapDimensions] = useState({
+    width: ORIGINAL_WIDTH,
+    height: ORIGINAL_HEIGHT,
+  });
+
+  const {
+    areas,
+    selectedAreaId,
+    setSelectedAreaId,
+    mapImage,
     isLoading,
     createArea,
     deleteArea,
   } = useAreas();
-  
+
   // Pass the dynamic dimensions to the useBins hook
   const {
     bins,
@@ -138,7 +140,7 @@ function MapHolder() {
     handleCreateNewBin,
     handleUpdateBinDesc,
   } = useBins(selectedAreaId, ORIGINAL_WIDTH, ORIGINAL_HEIGHT, BIN_SIZE_PIXELS);
-  
+
   // Effect to update dimensions on component mount and window resize
   useEffect(() => {
     const updateDimensions = () => {
@@ -154,10 +156,10 @@ function MapHolder() {
     updateDimensions();
 
     // Add event listener for window resize
-    window.addEventListener('resize', updateDimensions);
+    window.addEventListener("resize", updateDimensions);
 
     // Clean up event listener
-    return () => window.removeEventListener('resize', updateDimensions);
+    return () => window.removeEventListener("resize", updateDimensions);
   }, []); // Run only on mount and unmount
 
   useEffect(() => {
@@ -165,19 +167,19 @@ function MapHolder() {
       setSelectedAreaId(areas[0].area_id);
     }
   }, [areas, selectedAreaId, setSelectedAreaId]);
-  
+
   // The mapHolderStyle object now only contains the background image property
   // as the dimensions are controlled by the .map-holder-container CSS class.
   const mapHolderStyle = {
-    backgroundImage: mapImage ? `url(${mapImage})` : 'none',
+    backgroundImage: mapImage ? `url(${mapImage})` : "none",
   };
 
   if (isLoading) {
     return <div>Loading bins and areas...</div>;
   }
-  
-  const filteredBins = selectedAreaId 
-    ? bins.filter(bin => bin.area_id === selectedAreaId) 
+
+  const filteredBins = selectedAreaId
+    ? bins.filter((bin) => bin.area_id === selectedAreaId)
     : [];
 
   return (
@@ -185,13 +187,16 @@ function MapHolder() {
       <style>{styles}</style>
       <div className="map-container">
         {/* New wrapper for area controls to manage flex-sizing */}
-        <div className="areas-sidebar-wrapper" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <div
+          className="areas-sidebar-wrapper"
+          style={{ display: "flex", flexDirection: "column", gap: "10px" }}
+        >
           <AreasControlButtons
             onCreate={createArea}
             onDelete={deleteArea}
             hasAreas={areas.length > 0}
             deleteTargetId={selectedAreaId}
-            deleteTargetArea={areas.find(a => a.area_id === selectedAreaId)}
+            deleteTargetArea={areas.find((a) => a.area_id === selectedAreaId)}
           />
 
           {/* New AreasSidebar component */}
@@ -205,35 +210,44 @@ function MapHolder() {
 
         {/* The map view wrapper that will fill available space */}
         <div className="map-view-wrapper">
-          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
             {/* The rest of your existing UI elements */}
-            <button 
-              onClick={handleDeleteBin}
-              disabled={!lastClickedBinId}
-              style={{ cursor: lastClickedBinId ? 'pointer' : 'not-allowed' }}
-            >
-              מחק פח
-            </button>
-            <button 
-              onClick={handleCreateNewBin}
-              disabled={!selectedAreaId}
-              style={{ cursor: selectedAreaId ? 'pointer' : 'not-allowed' }}
-            >
-              צור פח
-            </button>
-            <button 
+
+            <button
               onClick={() => handleUpdateBinDesc("0")}
               disabled={!lastClickedBinId}
-              style={{ cursor: lastClickedBinId ? 'pointer' : 'not-allowed', backgroundColor: 'green', color: 'white' }}
+              style={{
+                cursor: lastClickedBinId ? "pointer" : "not-allowed",
+                backgroundColor: "green",
+                color: "white",
+              }}
             >
               פח ריק
             </button>
-            <button 
+            <button
               onClick={() => handleUpdateBinDesc("1")}
               disabled={!lastClickedBinId}
-              style={{ cursor: lastClickedBinId ? 'pointer' : 'not-allowed', backgroundColor: 'red', color: 'white' }}
+              style={{
+                cursor: lastClickedBinId ? "pointer" : "not-allowed",
+                backgroundColor: "red",
+                color: "white",
+              }}
             >
               פח מלא
+            </button>
+            <button
+              onClick={handleDeleteBin}
+              disabled={!lastClickedBinId}
+              style={{ cursor: lastClickedBinId ? "pointer" : "not-allowed" }}
+            >
+              מחק פח
+            </button>
+            <button
+              onClick={handleCreateNewBin}
+              disabled={!selectedAreaId}
+              style={{ cursor: selectedAreaId ? "pointer" : "not-allowed" }}
+            >
+              צור פח
             </button>
           </div>
           <div
