@@ -2,9 +2,6 @@
 
 import { useState, useEffect } from "react";
 
-// Using glob import for assets. Note: Vite's glob import is specific.
-const areaImages = import.meta.glob('../../assets/areas/*.(png|jpg|jpeg|gif|svg|webp)', { eager: true });
-
 const useAreas = () => {
   const [areas, setAreas] = useState([]);
   const [selectedAreaId, setSelectedAreaId] = useState(null);
@@ -48,8 +45,9 @@ const useAreas = () => {
         throw new Error(`POST /api/areas failed: ${res.status} ${t}`);
       }
       const createdArea = await res.json();
-      // Update state with the newly created area
-      setAreas(currentAreas => [...currentAreas, createdArea]);
+      // Update state with the newly created area and select it
+      setAreas((currentAreas) => [...currentAreas, createdArea]);
+      setSelectedAreaId(createdArea.area_id);
       return createdArea;
     } catch (err) {
       console.error("Create area failed:", err);
@@ -62,9 +60,13 @@ const useAreas = () => {
   const deleteArea = async (areaId) => {
     try {
       setError(null);
-      const res = await fetch(`http://localhost:3000/api/areas/${areaId}`, { method: "DELETE" });
+      const res = await fetch(`http://localhost:3000/api/areas/${areaId}`, {
+        method: "DELETE",
+      });
       if (res.status === 409) {
-        const t = await res.text().catch(() => "Cannot delete area because it has bins.");
+        const t = await res
+          .text()
+          .catch(() => "Cannot delete area because it has bins.");
         throw new Error(`Conflict: ${t}`);
       }
       if (!res.ok && res.status !== 204) {
@@ -72,8 +74,8 @@ const useAreas = () => {
         throw new Error(`DELETE /api/areas/${areaId} failed: ${res.status} ${t}`);
       }
       // Update state by removing the deleted area
-      setAreas(currentAreas => {
-        const newAreas = currentAreas.filter(area => area.area_id !== areaId);
+      setAreas((currentAreas) => {
+        const newAreas = currentAreas.filter((area) => area.area_id !== areaId);
         // Re-select an area if the deleted one was selected
         if (selectedAreaId === areaId) {
           setSelectedAreaId(newAreas.length > 0 ? newAreas[0].area_id : null);
@@ -96,12 +98,10 @@ const useAreas = () => {
   // Update map image when selected area changes
   useEffect(() => {
     if (selectedAreaId && areas.length > 0) {
-      const selectedArea = areas.find(area => area.area_id === selectedAreaId);
+      const selectedArea = areas.find((area) => area.area_id === selectedAreaId);
       if (selectedArea && selectedArea.img_path) {
-        const filename = selectedArea.img_path.split(/[\\/]/).pop();
-        const imagePath = `../../assets/areas/${filename}`;
-        const imageModule = areaImages[imagePath];
-        setMapImage(imageModule ? imageModule.default : null);
+        // Use the img_path directly as the URL
+        setMapImage(selectedArea.img_path);
       } else {
         setMapImage(null);
       }
@@ -110,7 +110,16 @@ const useAreas = () => {
     }
   }, [selectedAreaId, areas]);
 
-  return { areas, selectedAreaId, setSelectedAreaId, mapImage, isLoading, error, createArea, deleteArea };
+  return {
+    areas,
+    selectedAreaId,
+    setSelectedAreaId,
+    mapImage,
+    isLoading,
+    error,
+    createArea,
+    deleteArea,
+  };
 };
 
 export default useAreas;
