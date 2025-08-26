@@ -1,84 +1,84 @@
 import React, { useRef, useEffect, useState } from "react";
 import DraggableObj from "./DraggableObj";
 import AreasControlButtons from "./AreasControlButtons";
-import AreasSidebar from "./AreasSidebar"; // New: Import AreasSidebar
+import AreasSidebar from "./AreasSidebar";
 import useBins from "../hooks/useBins";
 import useAreas from "../hooks/useAreas";
 
 // This CSS now uses a combination of properties for fluid, aspect-ratio-locked sizing.
 const styles = `
 .map-container {
-  display: flex;
-  gap: 20px;
-  flex-direction: row-reverse; /* Default for desktop */
-  flex-wrap: wrap; /* Allows elements to wrap on smaller screens */
-  justify-content: center; /* Centers content when wrapped */
+    display: flex;
+    gap: 20px;
+    flex-direction: row-reverse; /* Default for desktop */
+    flex-wrap: wrap; /* Allows elements to wrap on smaller screens */
+    justify-content: center; /* Centers content when wrapped */
 }
 
 /* Media query for small screens (e.g., mobile devices) */
 @media (max-width: 768px) {
-  .map-container {
-    flex-direction: column; /* Stack elements vertically */
-    align-items: center; /* Center them horizontally */
-  }
+    .map-container {
+        flex-direction: column; /* Stack elements vertically */
+        align-items: center; /* Center them horizontally */
+    }
 }
 
 .areas-sidebar-wrapper {
-  flex-shrink: 0;
-  width: 250px; /* fixed width for the sidebar on desktop */
+    flex-shrink: 0;
+    width: 250px; /* fixed width for the sidebar on desktop */
 }
 
 .areas-sidebar {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 10px;
-  background-color: #f9f9f9;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  box-sizing: border-box; /* Ensures padding and border are included in the width */
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-sizing: border-box; /* Ensures padding and border are included in the width */
 }
 
 @media (max-width: 768px) {
-  .areas-sidebar-wrapper {
-    width: 100%; /* Take full width on mobile */
-  }
+    .areas-sidebar-wrapper {
+        width: 100%; /* Take full width on mobile */
+    }
 }
 
 .area-button {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid transparent;
-  background-color: transparent;
-  text-align: right;
-  cursor: pointer;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  font-size: 16px;
-  color: #333;
-  transition: all 0.2s ease-in-out;
-  border-radius: 6px;
-  box-sizing: border-box;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid transparent;
+    background-color: transparent;
+    text-align: right;
+    cursor: pointer;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 16px;
+    color: #333;
+    transition: all 0.2s ease-in-out;
+    border-radius: 6px;
+    box-sizing: border-box;
 }
 
 .area-button:hover,
 .area-button:focus {
-  background-color: #e0e0e0;
-  border-color: #ccc;
-  outline: none;
+    background-color: #e0e0e0;
+    border-color: #ccc;
+    outline: none;
 }
 
 .area-button.is-selected {
-  background-color: #007bff;
-  color: white;
-  border-color: #007bff;
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
 }
 
 .area-button.is-selected:hover,
 .area-button.is-selected:focus {
-  background-color: #0056b3;
+    background-color: #0056b3;
 }
 
 .container-button {
-  margin-bottom: 8px;
-  border-radius: 6px;
+    margin-bottom: 8px;
+    border-radius: 6px;
 }
 
 /*
@@ -86,24 +86,24 @@ The map holder container is now fluid within its max dimensions,
 maintaining a 10:8 aspect ratio.
 */
 .map-holder-container {
-  width: 100%;
-  max-width: 1000px;
-  max-height: 800px;
-  aspect-ratio: 1000 / 800;
-  position: relative;
-  border: 2px solid black;
-  box-sizing: border-box;
-  overflow: hidden;
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
+    width: 100%;
+    max-width: 1000px;
+    max-height: 800px;
+    aspect-ratio: 1000 / 800;
+    position: relative;
+    border: 2px solid black;
+    box-sizing: border-box;
+    overflow: hidden;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 .map-view-wrapper {
-  flex: 1; /* This wrapper now also takes up the remaining space */
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+    flex: 1; /* This wrapper now also takes up the remaining space */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 `;
 
@@ -182,6 +182,12 @@ function MapHolder() {
     ? bins.filter((bin) => bin.area_id === selectedAreaId)
     : [];
 
+  // This is the new function that sets both states
+  const handleSelectArea = (areaId) => {
+    setSelectedAreaId(areaId);
+    setLastClickedBinId(null); // This is the key change!
+  };
+
   return (
     <>
       <style>{styles}</style>
@@ -199,12 +205,12 @@ function MapHolder() {
             deleteTargetArea={areas.find((a) => a.area_id === selectedAreaId)}
           />
 
-          {/* New AreasSidebar component */}
+          {/* Updated AreasSidebar component with the new handler */}
           <AreasSidebar
             areas={areas}
             selectedId={selectedAreaId}
-            onSelect={setSelectedAreaId}
-            sortMode="id-asc" // You can change this to "name-asc", "name-desc", or "id-desc"
+            onSelect={handleSelectArea} // Use the new handler here
+            sortMode="id-asc"
           />
         </div>
 
