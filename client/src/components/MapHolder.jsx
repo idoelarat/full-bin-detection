@@ -4,6 +4,8 @@ import AreasControlButtons from "./AreasControlButtons";
 import AreasSidebar from "./AreasSidebar";
 import useBins from "../hooks/useBins";
 import useAreas from "../hooks/useAreas";
+import InfoAreas from "./InfoAreas";
+import InfoBox from "./InfoBox";
 
 // This CSS now uses a combination of properties for fluid, aspect-ratio-locked sizing.
 const styles = `
@@ -189,6 +191,9 @@ function MapHolder() {
   return (
     <>
       <style>{styles}</style>
+      {/* Render the InfoAreas component here, before the map-container */}
+      <InfoAreas filteredBins={filteredBins} />
+      
       <div className="map-container">
         {/* New wrapper for area controls to manage flex-sizing */}
         <div
