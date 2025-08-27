@@ -112,7 +112,7 @@ export default function AreasSidebar({
       role="listbox"
       aria-label="Areas"
       onKeyDown={handleKeyDown}
-      style={{ maxHeight: "407px", overflowY: "auto" }}
+      style={{ maxHeight: "800px", overflowY: "auto" }}
     >
       {sorted.length === 0 ? (
         <div style={{color:'black'}}>אין אזורים</div>
