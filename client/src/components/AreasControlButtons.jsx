@@ -25,6 +25,7 @@ export default function AreasControlButtons({
   hasAreas = false,
   deleteTargetId = null,
   deleteTargetArea = null,
+  existingAreaNames = [],
 }) {
   // ----- PLUS -----
   const [open, setOpen] = useState(false);
@@ -50,12 +51,19 @@ export default function AreasControlButtons({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const isAreaNameUnique = useMemo(() => {
+    const trimmedName = formData.areaName.trim();
+    return !existingAreaNames.some(
+      (name) => name.toLowerCase() === trimmedName.toLowerCase()
+    );
+  }, [formData.areaName, existingAreaNames]);
+
   const isValid = useMemo(
     () =>
       Object.values(formData).every(
         (v) => typeof v === "string" && v.trim() !== ""
-      ),
-    [formData]
+      ) && isAreaNameUnique,
+    [formData, isAreaNameUnique]
   );
 
   const handleSave = async (e) => {
@@ -77,7 +85,12 @@ export default function AreasControlButtons({
       setOpen(false);
     } catch (err) {
       console.error("Create area failed:", err);
-      setPlusError(err.message || "Failed to create area.");
+      // Check for the "Conflict" message from the backend
+      if (err.message && err.message.includes("Conflict")) {
+        setPlusError("שם האזור כבר קיים. אנא בחר שם אחר.");
+      } else {
+        setPlusError(err.message || "Failed to create area.");
+      }
     } finally {
       setSaving(false);
     }
@@ -96,14 +109,13 @@ export default function AreasControlButtons({
     if (!deleting) setConfirmOpen(false);
   };
 
-  // Update the areaLabel to use area_name first, then area_description
   const areaLabel = deleteTargetArea?.area_name?.trim()
     ? `"${deleteTargetArea.area_name}"`
     : deleteTargetArea?.area_description?.trim()
-    ? `"${deleteTargetArea.area_description}"`
-    : deleteTargetId != null
-    ? `Area #${deleteTargetId}`
-    : "this area";
+      ? `"${deleteTargetArea.area_description}"`
+      : deleteTargetId != null
+        ? `Area #${deleteTargetId}`
+        : "this area";
 
   const handleConfirmDelete = async () => {
     if (!deleteTargetId || deleting) return;
@@ -199,6 +211,10 @@ export default function AreasControlButtons({
                   disabled={saving}
                   inputProps={{ dir: "rtl" }}
                   InputLabelProps={{ sx: { left: "unset", right: 0 } }}
+                  error={!isAreaNameUnique}
+                  helperText={
+                    !isAreaNameUnique ? "שם אזור זה כבר קיים" : ""
+                  }
                 />
                 <TextField
                   name="areaDescription"

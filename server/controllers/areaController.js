@@ -40,6 +40,12 @@ const AreaController = {
     AreaModel.create(areaData, (err, result) => {
       if (err) {
         console.error("Controller Error: creating area:", err);
+        
+        // Check if the error is a duplicate entry (MySQL code ER_DUP_ENTRY)
+        if (err.code === 'ER_DUP_ENTRY') {
+          return res.status(409).json({ error: "Area name already exists." });
+        }
+
         return res.status(500).json({ error: "Failed to create area" });
       }
       res.status(201).json({

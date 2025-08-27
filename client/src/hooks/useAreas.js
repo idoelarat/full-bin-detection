@@ -41,6 +41,14 @@ const useAreas = () => {
         body: JSON.stringify(payload),
       });
       if (!res.ok) {
+        // If the status is 409, a specific conflict has occurred
+        if (res.status === 409) {
+          // Parse the error message from the server
+          const t = await res.text().catch(() => "Duplicate area name.");
+          // Throw an error with the server's message for the component to use
+          throw new Error(`Conflict: ${t}`);
+        }
+        // For all other non-OK statuses, throw a generic error
         const t = await res.text().catch(() => "");
         throw new Error(`POST /api/areas failed: ${res.status} ${t}`);
       }
