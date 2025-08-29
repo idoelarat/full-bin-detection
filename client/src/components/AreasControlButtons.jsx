@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
@@ -45,6 +45,19 @@ export default function AreasControlButtons({
     areaDescription: "",
     imageUrl: "",
   });
+
+  // image picker
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [images, setImages] = useState([]);
+
+  useEffect(() => {
+    if (!pickerOpen) return;
+    fetch("/pic_map/index.json")
+      .then(r => r.json())
+      .then(setImages)
+      .catch(() => setImages([]));
+  }, [pickerOpen]);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -242,6 +255,19 @@ export default function AreasControlButtons({
                   InputLabelProps={{ sx: { left: "unset", right: 0 } }}
                 />
 
+                <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                  <Button 
+                    id = "choose-existing-image-button"
+                    type="button"
+                    variant="outlined"
+                    onClick={() => setPickerOpen(true)}
+                    disabled={saving}
+                    sx={{ textTransform: "none" }}
+                  >
+                    Choose from existing images
+                  </Button>
+                </div>
+
                 <Stack direction="row" spacing={1.25} justifyContent="flex-end">
                   {/* Cancel */}
                   <motion.div
@@ -368,6 +394,98 @@ export default function AreasControlButtons({
           </div>
         </Fade>
       </Modal>
+
+      {/* Image Picker Modal */}
+      <Modal open={pickerOpen} onClose={() => setPickerOpen(false)}>
+        <Fade in={pickerOpen} timeout={150}>
+          <div
+            style={{
+              background: "#fff",
+              padding: 20,
+              margin: "10vh auto 0",
+              width: 680,
+              maxWidth: "92vw",
+              borderRadius: 12,
+              outline: "none",
+              boxShadow: "0 8px 20px rgba(0,0,0,.12), 0 2px 6px rgba(0,0,0,.08)",
+            }}
+          >
+            <h3 style={{ marginTop: 0 }} dir="rtl">בחר תמונה קיימת</h3>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))",
+                gap: 12,
+                maxHeight: 420,
+                overflowY: "auto",
+              }}
+            >
+              {images.map((src) => (
+                <button
+                  key={src}
+                  type="button"
+                  onClick={() => {
+                    setFormData((prev) => ({ ...prev, imageUrl: src }));
+                    setPickerOpen(false);
+                  }}
+                  style={{
+                    border: "1px solid #eee",
+                    borderRadius: 8,
+                    padding: 0,
+                    cursor: "pointer",
+                    background: "#fff",
+                    textAlign: "center",
+                  }}
+                  title={src}
+                >
+                  <img
+                    src={src}
+                    alt=""
+                    style={{
+                      width: "100%",
+                      height: 110,
+                      objectFit: "cover",
+                      borderTopLeftRadius: 8,
+                      borderTopRightRadius: 8,
+                    }}
+                  />
+                  <div
+                    style={{
+                      fontSize: 12,
+                      padding: 6,
+                      direction: "ltr",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }}
+                  >
+                    {decodeURIComponent(src.split("/").pop())}
+                  </div>
+                </button>
+              ))}
+              {images.length === 0 && (
+                <div
+                  style={{
+                    gridColumn: "1 / -1",
+                    textAlign: "center",
+                    color: "#666",
+                  }}
+                >
+                  אין תמונות ב־/pic_map/index.json
+                </div>
+              )}
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
+              <Button onClick={() => setPickerOpen(false)} sx={{ textTransform: "none" }}>
+                סגור
+              </Button>
+            </div>
+          </div>
+        </Fade>
+      </Modal>
+
     </>
   );
 }

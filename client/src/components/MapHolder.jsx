@@ -213,7 +213,7 @@ function MapHolder() {
             areas={areas}
             selectedId={selectedAreaId}
             onSelect={handleSelectArea}
-            sortMode="id-asc"
+            sortMode="name-asc"
           />
         </div>
 

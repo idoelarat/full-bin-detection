@@ -1,77 +1,65 @@
-// ./components/areas/AreasSidebar.jsx
+// ./components/AreasSidebar.jsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import AreaItem from "./AreaItem.jsx";
 
 /**
  * Props:
- * - areas: Array<{ area_id: number, area_description: string, ... }>
+ * - areas: Array<{ area_id: number, area_name?: string, area_description?: string, ... }>
  * - selectedId: number | null
  * - onSelect: (area_id: number) => void
- * - sortMode?: "description-asc" | "description-desc" | "id-asc" | "id-desc"
+ * - sortMode?: "name-asc" | "name-desc" | "id-asc" | "id-desc"
  */
 export default function AreasSidebar({
   areas = [],
   selectedId = null,
   onSelect = () => {},
-  sortMode = "description-asc",
+  sortMode = "name-asc",
 }) {
-  // Basic validation: area_description is required
+  // Basic validation: must include area_id
   useEffect(() => {
     for (const a of areas) {
-      if (
-        !a ||
-        a.area_id == null ||
-        typeof a.area_description !== "string" ||
-        !a.area_description.trim()
-      ) {
-        // Don't stop the app, just warn to show what's missing
-        console.warn(
-          "AreasSidebar: Each item must include area_id and a non-empty area_description:",
-          a
-        );
+      if (!a || a.area_id == null) {
+        console.warn("AreasSidebar: each item must include area_id:", a);
       }
     }
   }, [areas]);
 
-  // Sort based on sortMode, without modifying the original array
+  // Sorting logic
   const sorted = useMemo(() => {
     const copy = [...areas];
-    const cmpDescAsc = (x, y) =>
-      x.area_description.localeCompare(y.area_description, "he", {
+
+    const cmpNameAsc = (x, y) =>
+      (x.area_name || "").localeCompare(y.area_name || "", "en", {
         numeric: true,
         sensitivity: "base",
       });
-    const cmpDescDesc = (x, y) => -cmpDescAsc(x, y);
+    const cmpNameDesc = (x, y) => -cmpNameAsc(x, y);
+
     const cmpIdAsc = (x, y) => (x.area_id ?? 0) - (y.area_id ?? 0);
     const cmpIdDesc = (x, y) => -cmpIdAsc(x, y);
 
     switch (sortMode) {
-      case "description-desc":
-        return copy.sort(cmpDescDesc);
+      case "name-desc":
+        return copy.sort(cmpNameDesc);
       case "id-asc":
         return copy.sort(cmpIdAsc);
       case "id-desc":
         return copy.sort(cmpIdDesc);
-      case "description-asc":
+      case "name-asc":
       default:
-        return copy.sort(cmpDescAsc);
+        return copy.sort(cmpNameAsc);
     }
   }, [areas, sortMode]);
 
-  // Manage focus (roving tabindex): ↑/↓ moves focus, Enter selects
+  // Focus management
   const itemRefs = useRef([]);
   const [focusIndex, setFocusIndex] = useState(0);
 
-  // When selectedId changes externally – update the focus to the selected item (if it exists)
   useEffect(() => {
     const idx = sorted.findIndex((a) => a.area_id === selectedId);
-    if (idx >= 0) {
-      setFocusIndex(idx);
-      // Don't force automatic focus to avoid "jumping" for the user; just update the index
-    }
+    if (idx >= 0) setFocusIndex(idx);
   }, [selectedId, sorted]);
 
-  // If the list changes (sorting/data) ensure the index is valid
   useEffect(() => {
     if (sorted.length === 0) {
       setFocusIndex(0);
@@ -115,7 +103,7 @@ export default function AreasSidebar({
       style={{ maxHeight: "800px", overflowY: "auto" }}
     >
       {sorted.length === 0 ? (
-        <div style={{color:'black'}}>אין אזורים</div>
+        <div style={{ color: "black" }}>No areas</div>
       ) : (
         sorted.map((area, i) => {
           const id = Number(area.area_id ?? area.id);
