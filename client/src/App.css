@@ -1,5 +1,5 @@
 #root {
-  max-width: 1280px;
+
   margin: 0 auto;
   padding: 0;
 }
@@ -10,9 +10,11 @@
   will-change: filter;
   transition: filter 300ms;
 }
+
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
+
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
@@ -21,6 +23,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -41,11 +44,14 @@
 }
 
 .app-header {
+  width: 100vw;
+  /* Sets the width to 100% of the viewport width */
   background-color: #333;
   color: white;
   padding: 20px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  text-align: center;
+  text-align: left;
+  /* Aligns all text and inline content to the left */
 }
 
 .app-header h1 {
@@ -68,7 +74,7 @@
 
 .content-wrapper {
   /* This will set the margin to 5% of the viewport's height */
-  margin-top: 5vh; 
+  margin-top: 5vh;
   text-align: center;
 }
 

@@ -1,13 +1,12 @@
-import './App.css'
+//import './App.css'
 import MapHolder from './components/MapHolder'
+import ResponsiveAppBar from './components/AppBar'
 
 function App() {
 
   return (
     <>
-    <header className='app-header'>
-      <h1>Full Bin Detection System</h1>
-    </header>
+    <ResponsiveAppBar/>
     <div className='content-wrapper'>
       <MapHolder/>
     </div>
