@@ -133,7 +133,8 @@ export default function AreasSidebar({
       style={{ maxHeight: "800px", overflowY: "auto"}}
     >
       {sorted.length === 0 ? (
-        <div style={{ color: "black" }}>No areas</div>
+        <div style={{ fontFamily: "Fira Sans" , color:'#FF4F0F' }}>No areas</div>
+
       ) : (
         sorted.map((area, i) => {
           const id = Number(area.area_id ?? area.id);

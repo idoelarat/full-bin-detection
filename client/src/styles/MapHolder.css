@@ -136,10 +136,7 @@
   width: 100%; /* Ensure it spans the full width of its parent */
   
 }
-/* Add these new styles for the columns */
-.area-name-column {
-  /* No specific styling needed here, but you can add it if you want */
-}
+
 
 .map-buttons-wrapper {
     display: flex;
@@ -243,3 +240,4 @@ color:#03A6A1 ;
     color:#FF4F0F;
     font-family: 'Fira Sans';
 }
+

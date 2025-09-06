@@ -10,6 +10,10 @@ import Box from "@mui/material/Box";
 import { FaPlus, FaMinus } from "react-icons/fa";
 import { SlPencil } from "react-icons/sl";
 import { motion } from "framer-motion";
+import { SlSizeFullscreen } from "react-icons/sl";
+import Select from '@mui/joy/Select';
+import Option from '@mui/joy/Option';
+
 
 const enterVariants = {
   hidden: { opacity: 0, scale: 0.85, y: 6 },
@@ -256,6 +260,18 @@ export default function AreasControlButtons({
   };
 
 
+//BinSize 
+   const [binSize, setBinSize] = useState("Medium");
+   const [sizeModalOpen, setSizeModalOpen] = useState(false);
+
+   const handleSizeOpen = () => setSizeModalOpen(true);
+   const handleSizeClose = () => setSizeModalOpen(false);
+
+   const handleSizeChange = (event, newValue) => {
+    setBinSize(newValue);
+  };
+
+
   return (
     <>
       {/* Buttons */}
@@ -293,6 +309,21 @@ export default function AreasControlButtons({
         >
           <SlPencil size={22} />
         </IconButton>
+
+         {/* BinSize*/}
+      <IconButton
+        sx={{ color: "#FF4F0F" }}
+        aria-label="Bin Size"
+        onClick={handleSizeOpen}
+        size="large"
+      >
+        <SlSizeFullscreen size={22} />
+      </IconButton>
+
+
+
+
+
       </Stack>
 
       {/* Add Modal */}
@@ -699,6 +730,93 @@ export default function AreasControlButtons({
           </div>
         </Fade>
       </Modal>
+      {/* ChangeSize Modal*/}
+        <Modal open={sizeModalOpen} onClose={handleSizeClose}>
+        <Fade in={sizeModalOpen} timeout={200}>
+        <div
+        style={{
+          background: "#fff",
+        padding: 20,
+        margin: "12vh auto 0",
+        width: 320,
+        borderRadius: 12,
+        outline: "none",
+        boxShadow: "0 8px 20px rgba(0,0,0,.12), 0 2px 6px rgba(0,0,0,.08)",
+      }}
+    >
+      <h2 style={{ marginTop: 0, color: "black" , fontFamily: 'Fira Sans'}}>Choose Bin Size</h2>
+
+      <Stack direction="column" spacing={3}>
+
+        {/* Size Component */}
+        <Select
+          defaultValue="Medium"
+          value={binSize}
+          onChange={(event, newValue) => setBinSize(newValue)}
+          slotProps={{
+            listbox: {
+              sx: { zIndex: 1500 }, 
+            },
+          }}
+        >
+          <Option value="Small">Small</Option>
+          <Option value="Medium">Medium</Option>
+          <Option value="Big">Big</Option>
+        </Select>
+
+        {/* Buttons */}
+        <Stack direction="row" spacing={2} justifyContent="center">
+          <motion.div
+                    variants={enterVariants}
+                    initial="hidden"
+                    animate="visible"
+                    transition={{ duration: 0.25, delay: 0.05 }}
+                    whileHover="hover"
+                    whileTap="tap"
+                  >
+                    <motion.div variants={interactVariants}>
+                      <Button
+                        type="button"
+                        variant="contained"
+                        onClick={handleSizeClose}
+                        disabled={editing}
+                        sx={{ backgroundColor: "orange", color: "white", textTransform: "none" }}
+
+                      >
+                        Save
+                      </Button>
+                    </motion.div>
+                  </motion.div>
+                  {/* Cancel */}
+                  <motion.div
+                    variants={enterVariants}
+                    initial="hidden"
+                    animate="visible"
+                    transition={{ duration: 0.25, delay: 0.05 }}
+                    whileHover="hover"
+                    whileTap="tap"
+                  >
+                    <motion.div variants={interactVariants}>
+                      <Button
+                        type="button"
+                        variant="contained"
+                        onClick={handleSizeClose}
+                        disabled={editing}
+                        sx={{
+                          textTransform: "none",
+                          backgroundColor: "#666",
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </motion.div>
+                  </motion.div>
+        </Stack>
+      </Stack>
+    </div>
+  </Fade>
+</Modal>
+
     </>
   );
 }

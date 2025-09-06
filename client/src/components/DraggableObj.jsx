@@ -15,7 +15,6 @@ function DraggableObj({
   onBinClick,
   isClicked,
   binDesc,
-
 }) {
   // Position and size are now managed as percentages
   const [position, setPosition] = useState({ x: 0, y: 0 });
