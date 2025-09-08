@@ -5,8 +5,6 @@ import AreasSidebar from "./AreasSidebar";
 import useBins from "../hooks/useBins";
 import useAreas from "../hooks/useAreas";
 import InfoAreas from "./InfoAreas";
-import InfoBox from "./InfoBox";
-// Import the CSS file
 import "../styles/MapHolder.css";
 
 const BIN_SIZE_PIXELS = 50;
@@ -19,6 +17,9 @@ function MapHolder() {
     width: ORIGINAL_WIDTH,
     height: ORIGINAL_HEIGHT,
   });
+
+  // 🆕 state לניהול גודל הפחים
+  const [binSize, setBinSize] = useState("Medium");
 
   const {
     areas,
@@ -88,6 +89,7 @@ function MapHolder() {
             hasAreas={areas.length > 0}
             deleteTargetId={selectedAreaId}
             deleteTargetArea={areas.find((a) => a.area_id === selectedAreaId)}
+            onSizeChange={setBinSize}   
           />
           <AreasSidebar
             areas={areas}
@@ -133,7 +135,7 @@ function MapHolder() {
         <div className="info-area-row">
           <div className="area-name-column">
             {selectedArea && <h1>{selectedArea.area_name}</h1>}
-            {selectedArea&& <h2>{selectedArea.area_description}</h2>}
+            {selectedArea && <h2>{selectedArea.area_description}</h2>}
           </div>
           <div className="info-box-column">
             <InfoAreas filteredBins={filteredBins} />
@@ -162,6 +164,7 @@ function MapHolder() {
                 mapDimensions={mapDimensions}
                 originalWidth={ORIGINAL_WIDTH}
                 originalHeight={ORIGINAL_HEIGHT}
+                binSize={binSize}  
               />
             ))
           ) : (
