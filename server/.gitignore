@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+<<<<<<< HEAD
+=======
+
+# Environment variables
+.env
+>>>>>>> 8409821 (Initial commit - full bin detection project)
