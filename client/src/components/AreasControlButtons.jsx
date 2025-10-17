@@ -5,22 +5,12 @@ import Modal from "@mui/material/Modal";
 import Fade from "@mui/material/Fade";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
-<<<<<<< HEAD
-=======
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
->>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
 import { FaPlus, FaMinus } from "react-icons/fa";
 import { SlPencil } from "react-icons/sl";
 import { motion } from "framer-motion";
 import { SlSizeFullscreen } from "react-icons/sl";
-<<<<<<< HEAD
 import Select from "@mui/joy/Select";
 import Option from "@mui/joy/Option";
-=======
-import Select from '@mui/joy/Select';
-import Option from '@mui/joy/Option';
->>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
 
 const enterVariants = {
   hidden: { opacity: 0, scale: 0.85, y: 6 },
@@ -32,6 +22,23 @@ const interactVariants = {
   tap: { scale: 0.96 },
 };
 
+/** ---- תמונות (רשימה לוקאלית) ---- */
+const LS_KEY = "uploadedImages";
+const loadImages = () => {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    const arr = JSON.parse(raw || "[]");
+    return Array.isArray(arr) ? arr : [];
+  } catch {
+    return [];
+  }
+};
+const saveImages = (arr) => {
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify(arr));
+  } catch {}
+};
+
 export default function AreasControlButtons({
   onCreate,
   onDelete,
@@ -41,10 +48,6 @@ export default function AreasControlButtons({
   deleteTargetArea = null,
   existingAreaNames = [],
   onSizeChange,
-<<<<<<< HEAD
-=======
-
->>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
 }) {
   // EDIT
   const [editOpen, setEditOpen] = useState(false);
@@ -104,13 +107,9 @@ export default function AreasControlButtons({
 
   const isEditNameUnique = useMemo(() => {
     const trimmedName = formData.areaName.trim();
-<<<<<<< HEAD
     const otherAreaNames = existingAreaNames.filter(
       (name) => name !== deleteTargetArea?.area_name
     );
-=======
-    const otherAreaNames = existingAreaNames.filter(name => name !== deleteTargetArea?.area_name);
->>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
     return !otherAreaNames.some(
       (name) => name.toLowerCase() === trimmedName.toLowerCase()
     );
@@ -123,11 +122,7 @@ export default function AreasControlButtons({
       ) && isAreaNameUnique,
     [formData, isAreaNameUnique]
   );
-<<<<<<< HEAD
 
-=======
-  
->>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
   const isEditValid = useMemo(
     () =>
       Object.values(formData).every(
@@ -150,51 +145,27 @@ export default function AreasControlButtons({
     });
     setOpen(true);
   };
-<<<<<<< HEAD
 
-=======
-  
->>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
   const handleClose = () => {
     if (!saving) setOpen(false);
   };
 
-  // image picker
+  /** ---- מודאל תמונות ---- */
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [images, setImages] = useState([]);
-<<<<<<< HEAD
+  const [images, setImages] = useState([]); // כל התמונות הקיימות לבחירה (מה-localStorage)
   const [clearing, setClearing] = useState(false);
 
-  // טען רשימת תמונות פעם אחת
+  // טען מהרשימה הלוקאלית פעם אחת
   useEffect(() => {
-    fetch("http://localhost:3000/api/images/list")
-      .then((r) => r.json())
-      .then((arr) => setImages(Array.isArray(arr) ? arr : []))
-      .catch(() => setImages([]));
+    setImages(loadImages());
   }, []);
-
-  // רענון הרשימה בכל פתיחה של המודאל (אופציונלי אך שימושי)
-  useEffect(() => {
-    if (!pickerOpen) return;
-    fetch("http://localhost:3000/api/images/list")
-      .then((r) => r.json())
-      .then((arr) => setImages(Array.isArray(arr) ? arr : []))
-=======
-
-  useEffect(() => {
-    if (!pickerOpen) return;
-    fetch("/pic_map/index.json")
-      .then((r) => r.json())
-      .then(setImages)
->>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
-      .catch(() => setImages([]));
-  }, [pickerOpen]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // העלאת קובץ -> שמירה בשרת -> הוספה מיידית לרשימה המקומית (state + localStorage)
   const handleFileUpload = async (file) => {
     const formDataUpload = new FormData();
     formDataUpload.append("image", file);
@@ -205,32 +176,21 @@ export default function AreasControlButtons({
         body: formDataUpload,
       });
       const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Upload failed");
 
-      if (!res.ok) {
-        throw new Error(data.error || "Upload failed");
-      }
-
-<<<<<<< HEAD
       const fullUrl = data.fullUrl
         ? data.fullUrl
         : `http://localhost:3000${data.imageUrl}`;
 
+      // קבע את התמונה בטופס
       setFormData((prev) => ({ ...prev, imageUrl: fullUrl }));
 
-      // הוסף מיד למודאל
+      // הוסף מיד לרשימה המקומית (ללא כפילויות)
       setImages((prev) => {
-        const next = new Set(prev);
-        next.add(fullUrl);
-        return Array.from(next);
+        const next = Array.from(new Set([...prev, fullUrl]));
+        saveImages(next);
+        return next;
       });
-=======
-      setFormData((prev) => ({
-        ...prev,
-        imageUrl: `http://localhost:3000${data.imageUrl}`,
-      }));
-
-      setImages((prev) => [...prev, data.imageUrl]);
->>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
     } catch (err) {
       console.error("Upload failed:", err);
       setPlusError("Upload failed");
@@ -253,16 +213,13 @@ export default function AreasControlButtons({
 
       await onCreate(payload);
 
+      // ודא שה־URL מופיע גם ברשימת התמונות (Edge case אם המשתמש הזין ידנית URL)
       setImages((prev) => {
-<<<<<<< HEAD
         const url = formData.imageUrl.trim();
-        if (!prev.includes(url)) return [...prev, url];
-=======
-        if (!prev.includes(formData.imageUrl.trim())) {
-          return [...prev, formData.imageUrl.trim()];
-        }
->>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
-        return prev;
+        if (!url) return prev;
+        const next = Array.from(new Set([...prev, url]));
+        saveImages(next);
+        return next;
       });
 
       setFormData({ areaName: "", areaDescription: "", imageUrl: "" });
@@ -288,11 +245,7 @@ export default function AreasControlButtons({
     setMinusError(null);
     setConfirmOpen(true);
   };
-<<<<<<< HEAD
 
-=======
-  
->>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
   const closeConfirm = () => {
     if (!deleting) setConfirmOpen(false);
   };
@@ -337,44 +290,24 @@ export default function AreasControlButtons({
 
   const handleSizeOpen = () => setSizeModalOpen(true);
   const handleSizeClose = () => setSizeModalOpen(false);
-
-  const handleSizeChange = (event, newValue) => {
-    setBinSize(newValue);
-  };
-
+  const handleSizeChange = (event, newValue) => setBinSize(newValue);
   const handleSizeSave = () => {
-<<<<<<< HEAD
     onSizeChange?.(binSize);
     setSizeModalOpen(false);
   };
 
-  const handleClearAllImages = async () => {
+  // ניקוי רשימת התמונות המקומית (לא מוחק קבצים מהשרת)
+  const handleClearAllImages = () => {
     if (clearing) return;
-    const ok = window.confirm("Are you sure you want to delete ALL images?");
+    const ok = window.confirm("Are you sure you want to clear the local images list?");
     if (!ok) return;
-
+    setClearing(true);
     try {
-      setClearing(true);
-      const res = await fetch("http://localhost:3000/api/images/clear", {
-        method: "DELETE",
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || "Failed to clear images");
-      }
-      setImages([]); 
-    } catch (err) {
-      console.error(err);
-      alert(err.message || "Failed to clear images");
+      setImages([]);
+      saveImages([]);
     } finally {
       setClearing(false);
     }
-=======
-    if (onSizeChange) {
-      onSizeChange(binSize);   
-    }
-    setSizeModalOpen(false);
->>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
   };
 
   return (
@@ -428,7 +361,6 @@ export default function AreasControlButtons({
       <Modal open={open} onClose={handleClose}>
         <Fade in={open} timeout={200}>
           <div style={modalStyle}>
-<<<<<<< HEAD
             <h2 style={{ color: "#111", margin: 0, marginBottom: 16, fontFamily: "Fira Sans" }}>
               Add New Area
             </h2>
@@ -437,10 +369,6 @@ export default function AreasControlButtons({
                 Error: {plusError}
               </p>
             )}
-=======
-            <h2 style={{ color: "#111", margin: 0, marginBottom: 16 , fontFamily: "Fira Sans"}}>Add New Area</h2>
-            {plusError && <p style={{ color: "crimson" , fontFamily: "Fira Sans" }}>Error: {plusError}</p>}
->>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
             <form onSubmit={handleSave} noValidate>
               <Stack direction="column" spacing={1.5}>
                 <TextField
@@ -475,15 +403,7 @@ export default function AreasControlButtons({
                 />
 
                 <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
-<<<<<<< HEAD
                   <Button variant="outlined" component="label" sx={{ textTransform: "none" }}>
-=======
-                  <Button
-                    variant="outlined"
-                    component="label"
-                    sx={{ textTransform: "none" }}
-                  >
->>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
                     Upload from computer
                     <input
                       type="file"
@@ -568,17 +488,11 @@ export default function AreasControlButtons({
       <Modal open={confirmOpen} onClose={closeConfirm}>
         <Fade in={confirmOpen} timeout={150}>
           <div style={modalStyle}>
-<<<<<<< HEAD
             <h2 style={{ marginTop: 0, color: "black", fontFamily: "Fira Sans" }}>
               Delete Area
             </h2>
             {minusError && <p style={{ color: "crimson" }}>Error: {minusError}</p>}
             <p style={{ margin: "8px 0 16px", color: "black", fontFamily: "Fira Sans" }}>
-=======
-            <h2 style={{ marginTop: 0, color: "black" , fontFamily: "Fira Sans" }}>Delete Area</h2>
-            {minusError && <p style={{ color: "crimson" }}>Error: {minusError}</p>}
-            <p style={{ margin: "8px 0 16px", color: "black" , fontFamily: "Fira Sans" }}>
->>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
               Are you sure you want to delete the area : <b>{areaLabel}</b> ?
             </p>
 
@@ -641,13 +555,9 @@ export default function AreasControlButtons({
       <Modal open={editOpen} onClose={handleEditClose}>
         <Fade in={editOpen} timeout={200}>
           <div style={modalStyle}>
-<<<<<<< HEAD
             <h2 style={{ color: "#111", margin: 0, marginBottom: 16, fontFamily: "Fira Sans" }}>
               Edit Area
             </h2>
-=======
-            <h2 style={{ color: "#111", margin: 0, marginBottom: 16 , fontFamily: "Fira Sans" }}>Edit Area</h2>
->>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
             {editError && <p style={{ color: "crimson" }}>Error: {editError}</p>}
 
             <form onSubmit={handleEditSave} noValidate>
@@ -779,13 +689,9 @@ export default function AreasControlButtons({
               boxShadow: "0 8px 20px rgba(0,0,0,.12), 0 2px 6px rgba(0,0,0,.08)",
             }}
           >
-<<<<<<< HEAD
             <h2 style={{ marginTop: 0, color: "black ", fontFamily: "Fira Sans" }}>
               Choose Existing Image
             </h2>
-=======
-            <h2 style={{ marginTop: 0, color: "black " , fontFamily: "Fira Sans"}}>Choose Existing Image</h2>
->>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
 
             <div
               style={{
@@ -847,16 +753,11 @@ export default function AreasControlButtons({
                     color: "#666",
                   }}
                 >
-<<<<<<< HEAD
                   No images found
-=======
-                  No images found in /pic_map/index.json
->>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
                 </div>
               )}
             </div>
 
-<<<<<<< HEAD
             <div
               style={{
                 display: "flex",
@@ -868,17 +769,16 @@ export default function AreasControlButtons({
               <Button
                 onClick={handleClearAllImages}
                 disabled={clearing}
-                color="error"
-                variant="outlined"
-                sx={{ textTransform: "none" ,border: "none" }}
-                title="Delete all images from server"
+                sx={{
+                  textTransform: "none",
+                  color: "#d32f2f",
+                  border: "none",
+                }}
+                title="Clear local images list"
               >
                 {clearing ? "Clearing..." : "Clear"}
               </Button>
 
-=======
-            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
->>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
               <Button onClick={() => setPickerOpen(false)} sx={{ textTransform: "none" }}>
                 Close
               </Button>
@@ -886,7 +786,6 @@ export default function AreasControlButtons({
           </div>
         </Fade>
       </Modal>
-<<<<<<< HEAD
 
       {/* Bin size Modal */}
       <Modal open={sizeModalOpen} onClose={handleSizeClose}>
@@ -905,22 +804,6 @@ export default function AreasControlButtons({
             <h2 style={{ marginTop: 0, color: "black", fontFamily: "Fira Sans" }}>
               Choose Bin Size
             </h2>
-=======
-      
-      {/* Bin size Modal */}
-      <Modal open={sizeModalOpen} onClose={handleSizeClose}>
-        <Fade in={sizeModalOpen} timeout={200}>
-          <div style={{
-            background: "#fff",
-            padding: 20,
-            margin: "12vh auto 0",
-            width: 320,
-            borderRadius: 12,
-            outline: "none",
-            boxShadow: "0 8px 20px rgba(0,0,0,.12), 0 2px 6px rgba(0,0,0,.08)",
-          }}>
-            <h2 style={{ marginTop: 0, color: "black", fontFamily: "Fira Sans"}}>Choose Bin Size</h2>
->>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
             <Stack direction="column" spacing={3}>
               <Select
                 defaultValue="Medium"
@@ -982,8 +865,4 @@ export default function AreasControlButtons({
       </Modal>
     </>
   );
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f

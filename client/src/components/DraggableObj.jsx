@@ -14,11 +14,7 @@ function DraggableObj({
   onBinClick,
   isClicked,
   binDesc,
-<<<<<<< HEAD
   binSize = "Medium",
-=======
-  binSize = "Medium",   
->>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
 }) {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [size, setSize] = useState({ width: 0, height: 0 });
@@ -27,11 +23,7 @@ function DraggableObj({
   const offsetRef = useRef({ x: 0, y: 0 });
 
   const calculateSize = (selectedSize) => {
-<<<<<<< HEAD
     let multiplier = 1;
-=======
-    let multiplier = 1; 
->>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
     if (selectedSize === "Small") multiplier = 0.7;
     if (selectedSize === "Big") multiplier = 1.5;
 

@@ -2,7 +2,6 @@
 import express from "express";
 import multer from "multer";
 import path from "path";
-<<<<<<< HEAD
 import fs from "fs";
 
 const router = express.Router();
@@ -79,34 +78,6 @@ router.delete("/clear", (req, res) => {
     console.error(e);
     res.status(500).json({ error: "Failed to clear images" });
   }
-=======
-
-const router = express.Router();
-
-// הגדרת איפה נשמרות התמונות
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/"); // התיקייה חייבת להיות קיימת בפרויקט
-  },
-  filename: (req, file, cb) => {
-    // שם קובץ ייחודי: timestamp + הסיומת המקורית
-    cb(null, Date.now() + path.extname(file.originalname));
-  },
-});
-
-const upload = multer({ storage });
-
-// נתיב העלאה
-router.post("/upload", upload.single("image"), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: "No file uploaded" });
-  }
-
-  // ה־URL הקבוע שבו אפשר לגשת לקובץ
-  const imageUrl = `/uploads/${req.file.filename}`;
-
-  res.json({ imageUrl });
->>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
 });
 
 export default router;

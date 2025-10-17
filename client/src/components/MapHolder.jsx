@@ -18,13 +18,8 @@ function MapHolder() {
     height: ORIGINAL_HEIGHT,
   });
 
-<<<<<<< HEAD
 
   const [sizeByArea, setSizeByArea] = useState({});
-=======
-  // 🆕 state לניהול גודל הפחים
-  const [binSize, setBinSize] = useState("Medium");
->>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
 
   const {
     areas,
@@ -77,15 +72,12 @@ function MapHolder() {
     setLastClickedBinId(null);
   };
 
-<<<<<<< HEAD
 
   const handleSizeChangeForSelectedArea = (newSize) => {
     if (!selectedAreaId) return;
     setSizeByArea((prev) => ({ ...prev, [selectedAreaId]: newSize }));
   };
 
-=======
->>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
   if (isLoading) {
     return <div>Loading bins and areas...</div>;
   }
@@ -103,12 +95,8 @@ function MapHolder() {
             hasAreas={areas.length > 0}
             deleteTargetId={selectedAreaId}
             deleteTargetArea={areas.find((a) => a.area_id === selectedAreaId)}
-<<<<<<< HEAD
 
             onSizeChange={handleSizeChangeForSelectedArea}
-=======
-            onSizeChange={setBinSize}   
->>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
           />
           <AreasSidebar
             areas={areas}
@@ -183,12 +171,8 @@ function MapHolder() {
                 mapDimensions={mapDimensions}
                 originalWidth={ORIGINAL_WIDTH}
                 originalHeight={ORIGINAL_HEIGHT}
-<<<<<<< HEAD
                 
                 binSize={sizeByArea[bin.area_id] ?? "Medium"}
-=======
-                binSize={binSize}  
->>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
               />
             ))
           ) : (
