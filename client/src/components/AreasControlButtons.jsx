@@ -5,12 +5,22 @@ import Modal from "@mui/material/Modal";
 import Fade from "@mui/material/Fade";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
+<<<<<<< HEAD
+=======
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+>>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
 import { FaPlus, FaMinus } from "react-icons/fa";
 import { SlPencil } from "react-icons/sl";
 import { motion } from "framer-motion";
 import { SlSizeFullscreen } from "react-icons/sl";
+<<<<<<< HEAD
 import Select from "@mui/joy/Select";
 import Option from "@mui/joy/Option";
+=======
+import Select from '@mui/joy/Select';
+import Option from '@mui/joy/Option';
+>>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
 
 const enterVariants = {
   hidden: { opacity: 0, scale: 0.85, y: 6 },
@@ -31,6 +41,10 @@ export default function AreasControlButtons({
   deleteTargetArea = null,
   existingAreaNames = [],
   onSizeChange,
+<<<<<<< HEAD
+=======
+
+>>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
 }) {
   // EDIT
   const [editOpen, setEditOpen] = useState(false);
@@ -90,9 +104,13 @@ export default function AreasControlButtons({
 
   const isEditNameUnique = useMemo(() => {
     const trimmedName = formData.areaName.trim();
+<<<<<<< HEAD
     const otherAreaNames = existingAreaNames.filter(
       (name) => name !== deleteTargetArea?.area_name
     );
+=======
+    const otherAreaNames = existingAreaNames.filter(name => name !== deleteTargetArea?.area_name);
+>>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
     return !otherAreaNames.some(
       (name) => name.toLowerCase() === trimmedName.toLowerCase()
     );
@@ -105,7 +123,11 @@ export default function AreasControlButtons({
       ) && isAreaNameUnique,
     [formData, isAreaNameUnique]
   );
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
   const isEditValid = useMemo(
     () =>
       Object.values(formData).every(
@@ -128,7 +150,11 @@ export default function AreasControlButtons({
     });
     setOpen(true);
   };
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
   const handleClose = () => {
     if (!saving) setOpen(false);
   };
@@ -136,6 +162,7 @@ export default function AreasControlButtons({
   // image picker
   const [pickerOpen, setPickerOpen] = useState(false);
   const [images, setImages] = useState([]);
+<<<<<<< HEAD
   const [clearing, setClearing] = useState(false);
 
   // טען רשימת תמונות פעם אחת
@@ -152,6 +179,14 @@ export default function AreasControlButtons({
     fetch("http://localhost:3000/api/images/list")
       .then((r) => r.json())
       .then((arr) => setImages(Array.isArray(arr) ? arr : []))
+=======
+
+  useEffect(() => {
+    if (!pickerOpen) return;
+    fetch("/pic_map/index.json")
+      .then((r) => r.json())
+      .then(setImages)
+>>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
       .catch(() => setImages([]));
   }, [pickerOpen]);
 
@@ -175,6 +210,7 @@ export default function AreasControlButtons({
         throw new Error(data.error || "Upload failed");
       }
 
+<<<<<<< HEAD
       const fullUrl = data.fullUrl
         ? data.fullUrl
         : `http://localhost:3000${data.imageUrl}`;
@@ -187,6 +223,14 @@ export default function AreasControlButtons({
         next.add(fullUrl);
         return Array.from(next);
       });
+=======
+      setFormData((prev) => ({
+        ...prev,
+        imageUrl: `http://localhost:3000${data.imageUrl}`,
+      }));
+
+      setImages((prev) => [...prev, data.imageUrl]);
+>>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
     } catch (err) {
       console.error("Upload failed:", err);
       setPlusError("Upload failed");
@@ -210,8 +254,14 @@ export default function AreasControlButtons({
       await onCreate(payload);
 
       setImages((prev) => {
+<<<<<<< HEAD
         const url = formData.imageUrl.trim();
         if (!prev.includes(url)) return [...prev, url];
+=======
+        if (!prev.includes(formData.imageUrl.trim())) {
+          return [...prev, formData.imageUrl.trim()];
+        }
+>>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
         return prev;
       });
 
@@ -238,7 +288,11 @@ export default function AreasControlButtons({
     setMinusError(null);
     setConfirmOpen(true);
   };
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
   const closeConfirm = () => {
     if (!deleting) setConfirmOpen(false);
   };
@@ -289,6 +343,7 @@ export default function AreasControlButtons({
   };
 
   const handleSizeSave = () => {
+<<<<<<< HEAD
     onSizeChange?.(binSize);
     setSizeModalOpen(false);
   };
@@ -314,6 +369,12 @@ export default function AreasControlButtons({
     } finally {
       setClearing(false);
     }
+=======
+    if (onSizeChange) {
+      onSizeChange(binSize);   
+    }
+    setSizeModalOpen(false);
+>>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
   };
 
   return (
@@ -367,6 +428,7 @@ export default function AreasControlButtons({
       <Modal open={open} onClose={handleClose}>
         <Fade in={open} timeout={200}>
           <div style={modalStyle}>
+<<<<<<< HEAD
             <h2 style={{ color: "#111", margin: 0, marginBottom: 16, fontFamily: "Fira Sans" }}>
               Add New Area
             </h2>
@@ -375,6 +437,10 @@ export default function AreasControlButtons({
                 Error: {plusError}
               </p>
             )}
+=======
+            <h2 style={{ color: "#111", margin: 0, marginBottom: 16 , fontFamily: "Fira Sans"}}>Add New Area</h2>
+            {plusError && <p style={{ color: "crimson" , fontFamily: "Fira Sans" }}>Error: {plusError}</p>}
+>>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
             <form onSubmit={handleSave} noValidate>
               <Stack direction="column" spacing={1.5}>
                 <TextField
@@ -409,7 +475,15 @@ export default function AreasControlButtons({
                 />
 
                 <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+<<<<<<< HEAD
                   <Button variant="outlined" component="label" sx={{ textTransform: "none" }}>
+=======
+                  <Button
+                    variant="outlined"
+                    component="label"
+                    sx={{ textTransform: "none" }}
+                  >
+>>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
                     Upload from computer
                     <input
                       type="file"
@@ -494,11 +568,17 @@ export default function AreasControlButtons({
       <Modal open={confirmOpen} onClose={closeConfirm}>
         <Fade in={confirmOpen} timeout={150}>
           <div style={modalStyle}>
+<<<<<<< HEAD
             <h2 style={{ marginTop: 0, color: "black", fontFamily: "Fira Sans" }}>
               Delete Area
             </h2>
             {minusError && <p style={{ color: "crimson" }}>Error: {minusError}</p>}
             <p style={{ margin: "8px 0 16px", color: "black", fontFamily: "Fira Sans" }}>
+=======
+            <h2 style={{ marginTop: 0, color: "black" , fontFamily: "Fira Sans" }}>Delete Area</h2>
+            {minusError && <p style={{ color: "crimson" }}>Error: {minusError}</p>}
+            <p style={{ margin: "8px 0 16px", color: "black" , fontFamily: "Fira Sans" }}>
+>>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
               Are you sure you want to delete the area : <b>{areaLabel}</b> ?
             </p>
 
@@ -561,9 +641,13 @@ export default function AreasControlButtons({
       <Modal open={editOpen} onClose={handleEditClose}>
         <Fade in={editOpen} timeout={200}>
           <div style={modalStyle}>
+<<<<<<< HEAD
             <h2 style={{ color: "#111", margin: 0, marginBottom: 16, fontFamily: "Fira Sans" }}>
               Edit Area
             </h2>
+=======
+            <h2 style={{ color: "#111", margin: 0, marginBottom: 16 , fontFamily: "Fira Sans" }}>Edit Area</h2>
+>>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
             {editError && <p style={{ color: "crimson" }}>Error: {editError}</p>}
 
             <form onSubmit={handleEditSave} noValidate>
@@ -695,9 +779,13 @@ export default function AreasControlButtons({
               boxShadow: "0 8px 20px rgba(0,0,0,.12), 0 2px 6px rgba(0,0,0,.08)",
             }}
           >
+<<<<<<< HEAD
             <h2 style={{ marginTop: 0, color: "black ", fontFamily: "Fira Sans" }}>
               Choose Existing Image
             </h2>
+=======
+            <h2 style={{ marginTop: 0, color: "black " , fontFamily: "Fira Sans"}}>Choose Existing Image</h2>
+>>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
 
             <div
               style={{
@@ -759,11 +847,16 @@ export default function AreasControlButtons({
                     color: "#666",
                   }}
                 >
+<<<<<<< HEAD
                   No images found
+=======
+                  No images found in /pic_map/index.json
+>>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
                 </div>
               )}
             </div>
 
+<<<<<<< HEAD
             <div
               style={{
                 display: "flex",
@@ -783,6 +876,9 @@ export default function AreasControlButtons({
                 {clearing ? "Clearing..." : "Clear"}
               </Button>
 
+=======
+            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
+>>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
               <Button onClick={() => setPickerOpen(false)} sx={{ textTransform: "none" }}>
                 Close
               </Button>
@@ -790,6 +886,7 @@ export default function AreasControlButtons({
           </div>
         </Fade>
       </Modal>
+<<<<<<< HEAD
 
       {/* Bin size Modal */}
       <Modal open={sizeModalOpen} onClose={handleSizeClose}>
@@ -808,6 +905,22 @@ export default function AreasControlButtons({
             <h2 style={{ marginTop: 0, color: "black", fontFamily: "Fira Sans" }}>
               Choose Bin Size
             </h2>
+=======
+      
+      {/* Bin size Modal */}
+      <Modal open={sizeModalOpen} onClose={handleSizeClose}>
+        <Fade in={sizeModalOpen} timeout={200}>
+          <div style={{
+            background: "#fff",
+            padding: 20,
+            margin: "12vh auto 0",
+            width: 320,
+            borderRadius: 12,
+            outline: "none",
+            boxShadow: "0 8px 20px rgba(0,0,0,.12), 0 2px 6px rgba(0,0,0,.08)",
+          }}>
+            <h2 style={{ marginTop: 0, color: "black", fontFamily: "Fira Sans"}}>Choose Bin Size</h2>
+>>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
             <Stack direction="column" spacing={3}>
               <Select
                 defaultValue="Medium"
@@ -869,4 +982,8 @@ export default function AreasControlButtons({
       </Modal>
     </>
   );
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f

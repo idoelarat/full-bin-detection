@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ## Full Bin Detection – Local Setup
 
 A guide to run the project locally (Node.js server + Vite React client).
@@ -24,6 +25,13 @@ Server runs at http://localhost:3000
 Run the client:
 cd client && npm run dev
 Client runs at http://localhost:5173
+=======
+# Full bin detection
+
+This project, Full Bin Detection, is an intelligent system designed to manage and locate full trash bins across a campus.
+
+The primary goal is to optimize waste collection, reduce unnecessary emptying of empty bins, and improve overall campus cleanliness. By doing so, it aims to lower operational costs associated with waste management.
+>>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
 
 ## Authors
 

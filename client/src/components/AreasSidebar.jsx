@@ -13,8 +13,14 @@ export default function AreasSidebar({
   const [editingName, setEditingName] = useState("");
   const [editingDesc, setEditingDesc] = useState("");
 
+<<<<<<< HEAD
   
   
+=======
+  // This effect ensures that if the 'areas' prop changes while we are editing,
+  // we update our local editing state to reflect the latest data.
+  // This is a defensive measure to prevent old data from being shown in the form.
+>>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
   useEffect(() => {
     if (editingId) {
       const areaToEdit = areas.find(area => area.area_id === editingId);

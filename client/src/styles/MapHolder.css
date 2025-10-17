@@ -10,6 +10,10 @@ html, body {
     gap: 20px;
     flex-direction: row;
     justify-content: space-evenly;
+<<<<<<< HEAD
+=======
+    /* Add flex-wrap to prevent overflow on smaller screens */
+>>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
     flex-wrap: wrap;
 }
 
@@ -18,6 +22,10 @@ html, body {
     flex-direction: row;
     gap: 20px;
     align-items: flex-start;
+<<<<<<< HEAD
+=======
+    /* Add flex-shrink to prevent it from shrinking excessively */
+>>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
     flex-shrink: 0;
 }
 
@@ -124,6 +132,10 @@ html, body {
 
 .map-view-wrapper {
     position: relative;
+<<<<<<< HEAD
+=======
+    /* Essential for positioning child elements with `position: absolute` */
+>>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
@@ -138,6 +150,10 @@ html, body {
 
 }
 
+<<<<<<< HEAD
+=======
+/* New CSS to position the InfoAreas component on the map */
+>>>>>>> 3047e0688a457157a29eac394b451d96f2f6918f
 .info-areas-container {
     position: absolute;
     top: 10px;
